@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Home</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+
+p.event-icon-p {
+    line-height: 0.1;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+.card {
+  transition: transform 0.3s ease;
+}
+
+.event-link {
+  text-decoration: none;
+  color: black;
+}
+
+
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-light">
+  <a class="navbar-brand" href="./index.html">Concerts</a>
+
+  <div class="d-flex align-items-center">
+
+    <form class="form-inline mr-2">
+      <input class="form-control form-control-sm" type="search" placeholder="Search" aria-label="Search">
+    </form>
+    <div class="btn-group">
+        <button type="button" class="btn" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="./index.html">Home</a></li>
+            <li><a class="dropdown-item" href="./event-create.html">Create Event</a></li>
+            <li><a class="dropdown-item" href="./my-events.html">My Events</a></li>
+            <li><a class="dropdown-item" href="./history.html">History</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign Out</a></li>
+        </ul>
+    </div>
+</nav>
+<!-- <div class="d-flex justify-content-center"><h3>Select By Genre</h3></div> -->
+<div id="genre-cards" class="d-flex justify-content-around flex-column flex-md-row"></div>
+
+<hr class="mt-3">
+
+<div id="filter-selector" class="d-flex  justify-content-between px-4 pt-4 pb-1">
+    <h3 id="all-events-title"></h3>
+    <select class="form-select" style="width: 15%">
+        <option>Date</option>
+        <option>Price</option>
+        <option>Name</option>
+    </select>
+</div>
+<div id="cards" class="d-flex flex-wrap justify-content-center"></div>
+
+<script src="./handlers.js"></script>
+<script>
+
+const get_event_card = (preview_image, name, eid, date, genres, price, status) => {
+    const formatter = new Intl.DateTimeFormat('en-AU', {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+        timeZone: 'Australia/Brisbane'
+    });
+
+    const event_card = `
+    <div class="card card-hover m-1" style="width:30%">
+        <img class="card-img-top" src="${preview_image}" alt="Card image">
+        <div class="card-body">
+            <a href="./event-details.html?eid=${eid}" class="event-link stretched-link"><h4>${name}</h4></a>
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="card-text fw-bold">${formatter.format(date)}</p>
+                    <p class="card-text event-icon-p">${genres.join(", ")}</p>
+                    <p class="card-text event-icon-p">$${price}</p>
+                </div>
+                <div class="col-sm-6">
+                    <p>${status}</p>
+                    <p class="card-text fw-bold">Bisbane Entertainment Centre</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+
+    const template = document.createElement('template');
+    template.innerHTML = event_card.trim();
+    return template.content.firstChild;
+}
+
+const get_genre_card = genre => {
+    const genre_card = `
+    <div class="card card-hover">
+        <a href="./home.html?genre=${genre}" class="py-4 px-5 event-link stretched-link"><h5>${genre}</h5></a>
+    </div>
+    `;
+
+    const template = document.createElement('template');
+    template.innerHTML = genre_card.trim();
+    return template.content.firstChild;
+}
+
+let city = "Brisbane";
+
+const allEvents_title = document.getElementById("all-events-title")
+allEvents_title.innerText = `All Events in ${city}`;
+
+const cardsDiv = document.getElementById("cards");
+const genreCards = document.getElementById("genre-cards");
+const filterSelector = document.getElementById("filter-selector");
+
+filterSelector.addEventListener("change", handle_filter_update);
+
+const genres = ["Metal", "Rock", "Alt", "Rap", "Pop"];
+
+document.addEventListener("DOMContentLoaded", () => {
+    for (let i = 0; i < 10; i++) {
+        const event = get_event_card("./static/img/event.jpg", "Event " + i.toString(), 1, new Date(2026, 4, 21, 18, 0), ["Metal", "Rock"], 50, "OPEN");
+        cardsDiv.append(event);
+    }
+
+    genres.forEach(genre => {
+        genreCards.append(get_genre_card(genre));
+    });
+});
+
+</script>
+
+</body>
+</html>
