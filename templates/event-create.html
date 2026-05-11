@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="p-5">
+    <h2>Create Event</h2>
+    <form>
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Upload Preview</label>
+            <input class="form-control" type="file" id="formFile" accept="image/*">
+        </div>
+
+        <label for="event-name" class="form-lable">Event Name:</label>
+        <input id="event-name" type="text" class="form-control" placeholder="Event Name">
+
+        <label for="date-picker" class="form-lable">Date:</label>
+        <input type="text" id="date-picker" class="form-control" placeholder="Select Date..">
+
+        <label for="genre-input" class="form-lable">Genre:</label>
+        <select id="genre-input" class="form-control" name="states[]" multiple="multiple">
+            <option>Rock</option>
+            <option>Metal</option>
+            <option>Alt</option>
+        </select>
+
+        <label for="location" class="form-lable">Location:</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+            <input type="text" class="form-control" id="location">
+        </div>
+        
+
+        <label for="date-picker" class="form-lable">Price:</label>
+        <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="price-input" value="0">
+        </div>
+        
+        <label for="comment">Overview:</label>
+        <textarea class="form-control" rows="5" id="comment" name="Overview"></textarea>
+
+        <button type="submit" class="btn btn-success">Create</button>
+    </form>
+</div>
+
+<script>
+
+flatpickr("#date-picker", {
+    minDate: new Date().fp_incr(1),
+    enableTime: true,
+    dateFormat: "Y-m-d H:i"
+});
+$(document).ready(function() {
+    $('#genre-input').select2();
+});
+
+</script>
+
+{% endblock %}

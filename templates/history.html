@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+
+p.event-icon-p {
+    line-height: 0.1;
+}
+
+.event-link {
+  text-decoration: none;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="p-3">
+    <h3>History</h3>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <img src="./static/img/event.jpg" alt="Image Preview" class="img-fluid">
+                </div>
+                <div class="col-sm-9">
+                    <div class="d-flex">
+                        <div>
+                            <h4 class="card-title">Event Title</h4>
+                            <p class="card-text fw-bold event-icon-p">21 May 2026 at 6:00pm</p>
+                            <p class="card-text event-icon-p">Metal, Rock</p>
+                            <p class="card-text event-icon-p">$50</p>
+                            <a href="#" class="card-link event-link fw-bold" style="color: red">Unbook</a>
+                        </div>
+                        <div>
+                            <p class="m-3 fw-bold">OPEN</p>
+                            <p class="fw-bold">Booking ID: 1</p>
+                            <p class="card-text fw-bold">Bisbane Entertainment Centre</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
