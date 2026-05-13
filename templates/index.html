@@ -115,6 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+{% if current_user.is_authenticated %}
+    console.log("User is authenticated {{ current_user.username }}");
+{% endif %}
 </script>
 
 {% endblock %}
