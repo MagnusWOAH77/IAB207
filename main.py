@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, url_for
+from flask import Flask, abort, redirect, render_template, url_for, request, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -9,9 +9,14 @@ from user import User
 from database.base import db
 from database.User import User as DBUser
 from flask_bootstrap import Bootstrap
+from datetime import datetime
 
 from forms.signup import SignupForm
 from forms.login import LoginForm
+
+from forms.event import EventForm
+from database.Event import Event
+
 import bcrypt
 
 app = Flask(__name__)
@@ -32,24 +37,112 @@ def load_user(user_id):
     return User.get_user(user_id)
 
 @app.route("/")
-@login_required
 def index():
-    return render_template("index.html", title="Home")
+    selected_genre = request.args.get("genre")
+    search = request.args.get("search")
 
-@app.route("/event-create")
+    query = db.select(Event)
+
+    if selected_genre:
+        query = query.where(Event.genres.contains(selected_genre))
+
+    if search:
+        query = query.where(Event.name.contains(search))
+
+    events = db.session.execute(query.order_by(Event.event_datetime)).scalars().all()
+
+    for event in events:
+        event.update_status()
+
+    db.session.commit()
+
+    return render_template(
+        "index.html",
+        title="Home",
+        events=events,
+        selected_genre=selected_genre,
+        search=search
+    )
+
+@app.route("/event-create", methods=["GET", "POST"])
 @login_required
 def create_event_page():
-    return render_template("event-create.html", title="Create Event")
+    form = EventForm()
 
-@app.route("/event-details")
-@login_required
-def event_details_page():
-    return render_template("event-details.html", title="Event Details")
+    if form.validate_on_submit():
+        event_datetime = datetime.strptime(form.event_datetime.data, "%Y-%m-%d %H:%M")
+
+        event = Event(
+            name=form.name.data,
+            event_datetime=event_datetime,
+            location=form.location.data,
+            genres=", ".join(form.genres.data),
+            price=float(form.price.data),
+            tickets_available=form.tickets_available.data,
+            overview=form.overview.data,
+            acknowledgement_type=form.acknowledgement_type.data,
+            acknowledgement_text=form.acknowledgement_text.data,
+            owner_id=int(current_user.get_id()),
+            image_filename="event.jpg"
+        )
+
+        event.update_status()
+
+        db.session.add(event)
+        db.session.commit()
+
+        flash("Event created successfully.", "success")
+        return redirect(url_for("event_details_page", event_id=event.id))
+
+    return render_template("event-create.html", title="Create Event", form=form)
+
+@app.route("/event-details/<int:event_id>", methods=["GET", "POST"])
+def event_details_page(event_id):
+    event = db.get_or_404(Event, event_id)
+
+    event.update_status()
+    db.session.commit()
+
+    # TODO - booking form
+    # booking_form = BookingForm()
+    # comment_form = CommentForm()
+
+
+    return render_template(
+        "event-details.html",
+        title=event.name,
+        event=event
+    )
 
 @app.route("/my-events")
 @login_required
 def my_events_page():
-    return render_template("my-events.html", title="My Events")
+    events = db.session.execute(
+        db.select(Event)
+        .where(Event.owner_id == int(current_user.get_id()))
+        .order_by(Event.event_datetime)
+    ).scalars().all()
+
+    for event in events:
+        event.update_status()
+
+    db.session.commit()
+
+    return render_template("my-events.html", title="My Events", events=events)
+
+@app.route("/event/<int:event_id>/cancel", methods=["POST"])
+@login_required
+def cancel_event(event_id):
+    event = db.get_or_404(Event, event_id)
+
+    if event.owner_id != int(current_user.get_id()):
+        abort(403)
+
+    event.status = "Cancelled"
+    db.session.commit()
+
+    flash("Event cancelled.", "success")
+    return redirect(url_for("my_events_page"))
 
 @app.route("/history")
 @login_required
