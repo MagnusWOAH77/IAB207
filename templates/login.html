@@ -2,16 +2,41 @@
 
 {% block content %}
 
-<form method="POST" action="/login" class="p-3">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.username.label(class="form-label") }}
-        {{ form.username(class="form-control") }}
+<div class="auth-page">
+    <div class="auth-box">
+
+        <h1 class="auth-title">Welcome Back!</h1>
+
+        <p class="auth-description">
+            Sign in to continue where you left off.
+        </p>
+
+        <form method="POST" action="{{ url_for('login_page') }}" class="auth-form">
+            {{ form.hidden_tag() }}
+
+            <div class="auth-field">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-control", placeholder="Username") }}
+            </div>
+
+            <div class="auth-field">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-control", type="password", placeholder="Password") }}
+            </div>
+
+            <div class="forgot-row">
+                <a href="#" class="forgot-link">Forgot password?</a>
+            </div>
+
+            {{ form.submit(class="auth-btn", value="Login") }}
+        </form>
+
+        <div class="auth-bottom-link">
+            Already have an account?
+            <a href="{{ url_for('signup_page') }}">Create account</a>
+        </div>
+
     </div>
-    <div class="mb-3">
-        {{ form.password.label(class="form-label") }}
-        {{ form.password(class="form-control", type="password") }}
-    </div>
-    {{ form.submit(class="btn btn-primary") }}
-</form>
+</div>
+
 {% endblock %}
