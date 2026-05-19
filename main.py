@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 from user import User
 from database.base import db
 from database.User import User as DBUser
+from flask_bootstrap import Bootstrap
 
 from forms.signup import SignupForm
 from forms.login import LoginForm
@@ -15,6 +16,7 @@ import bcrypt
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "123"
+bootstrap = Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
