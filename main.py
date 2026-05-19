@@ -19,6 +19,7 @@ app.config["SECRET_KEY"] = "123"
 bootstrap = Bootstrap(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login_page"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.db"
 db.init_app(app)
@@ -102,3 +103,6 @@ def login_page():
         login_user(User(user.id, user.username, user.password))
         return redirect(url_for("index"))
     return render_template("login.html", title="Login", form=form)
+
+if __name__ == "__main__":
+    app.run(debug=True)
