@@ -4,56 +4,57 @@
 
 <div class="p-5">
     <h2>Create Event</h2>
-    <form>
-        <div class="mb-3">
-            <label for="formFile" class="form-label">Upload Preview</label>
-            <input class="form-control" type="file" id="formFile" accept="image/*">
-        </div>
 
-        <label for="event-name" class="form-lable">Event Name:</label>
-        <input id="event-name" type="text" class="form-control" placeholder="Event Name">
+    <form method="POST">
+        {{ form.hidden_tag() }}
 
-        <label for="date-picker" class="form-lable">Date:</label>
-        <input type="text" id="date-picker" class="form-control" placeholder="Select Date..">
+        <label class="form-label">Event Name:</label>
+        {{ form.name(class="form-control", placeholder="Event Name") }}
 
-        <label for="genre-input" class="form-lable">Genre:</label>
-        <select id="genre-input" class="form-control" name="states[]" multiple="multiple">
-            <option>Rock</option>
-            <option>Metal</option>
-            <option>Alt</option>
-        </select>
+        <label class="form-label">Date:</label>
+        {{ form.event_datetime(class="form-control", id="date-picker", placeholder="Select Date") }}
 
-        <label for="location" class="form-lable">Location:</label>
+        <label class="form-label">Genre:</label>
+        {{ form.genres(class="form-control", id="genre-input", multiple="multiple") }}
+
+        <label class="form-label">Location:</label>
         <div class="input-group">
             <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-            <input type="text" class="form-control" id="location">
+            {{ form.location(class="form-control") }}
         </div>
-        
 
-        <label for="date-picker" class="form-lable">Price:</label>
+        <label class="form-label">Price:</label>
         <div class="input-group">
             <span class="input-group-text">$</span>
-            <input type="number" class="form-control" id="price-input" value="0">
+            {{ form.price(class="form-control", value="0") }}
         </div>
-        
-        <label for="comment">Overview:</label>
-        <textarea class="form-control" rows="5" id="comment" name="Overview"></textarea>
 
-        <button type="submit" class="btn btn-success">Create</button>
+        <label class="form-label">Tickets Available:</label>
+        {{ form.tickets_available(class="form-control", value="25") }}
+
+        <label class="form-label">Overview:</label>
+        {{ form.overview(class="form-control", rows="5") }}
+
+        <label class="form-label">Acknowledgement of Country:</label>
+        {{ form.acknowledgement_type(class="form-control") }}
+
+        <label class="form-label">Acknowledgement Text:</label>
+        {{ form.acknowledgement_text(class="form-control", rows="4", placeholder="Optional acknowledgement text") }}
+
+        {{ form.submit(class="btn btn-success mt-3") }}
     </form>
 </div>
 
 <script>
-
 flatpickr("#date-picker", {
     minDate: new Date().fp_incr(1),
     enableTime: true,
     dateFormat: "Y-m-d H:i"
 });
+
 $(document).ready(function() {
     $('#genre-input').select2();
 });
-
 </script>
 
 {% endblock %}

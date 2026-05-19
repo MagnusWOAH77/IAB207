@@ -26,19 +26,73 @@ p.event-icon-p {
 {% endblock %}
 {% block content %}
 
-<div id="genre-cards" class="d-flex justify-content-around flex-column flex-md-row"></div>
+<div id="genre-cards" class="d-flex justify-content-around flex-column flex-md-row">
+    {% for genre in genres %}
+        <div class="card card-hover">
+            <a href="{{ url_for('index', genre=genre) }}" class="py-4 px-5 event-link stretched-link">
+                <h5>{{ genre }}</h5>
+            </a>
+        </div>
+    {% endfor %}
+</div>
 
 <hr class="mt-3">
 
-<div id="filter-selector" class="d-flex  justify-content-between px-4 pt-4 pb-1">
-    <h3 id="all-events-title"></h3>
-    <select class="form-select" style="width: 15%">
-        <option>Date</option>
-        <option>Price</option>
-        <option>Name</option>
-    </select>
+<div id="filter-selector" class="d-flex justify-content-between px-4 pt-4 pb-1">
+    <h3 id="all-events-title">
+        {% if selected_genre %}
+            {{ selected_genre }} Events in Brisbane
+        {% else %}
+            All Events in Brisbane
+        {% endif %}
+    </h3>
+
+    <form method="GET">
+        {% if selected_genre %}
+            <input type="hidden" name="genre" value="{{ selected_genre }}">
+        {% endif %}
+
+        <select class="form-select" name="sort" style="width: 150px" onchange="this.form.submit()">
+            <option value="date" {% if sort == "date" %}selected{% endif %}>Date</option>
+            <option value="price" {% if sort == "price" %}selected{% endif %}>Price</option>
+            <option value="name" {% if sort == "name" %}selected{% endif %}>Name</option>
+        </select>
+    </form>
 </div>
-<div id="cards" class="d-flex flex-wrap justify-content-center"></div>
+
+<div id="cards" class="d-flex flex-wrap justify-content-center">
+    {% for event in events %}
+        <div class="card card-hover m-1" style="width:30%">
+            <img class="card-img-top"
+                 src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+                 alt="Card image">
+
+            <div class="card-body">
+                <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                   class="event-link stretched-link">
+                    <h4>{{ event.name }}</h4>
+                </a>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="card-text fw-bold">
+                            {{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}
+                        </p>
+                        <p class="card-text event-icon-p">{{ event.genres }}</p>
+                        <p class="card-text event-icon-p">${{ "%.2f"|format(event.price) }}</p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <p>{{ event.status }}</p>
+                        <p class="card-text fw-bold">{{ event.location }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="m-4">No events found.</p>
+    {% endfor %}
+</div>
 
 <script src="{{ url_for('static', filename='js/handlers.js') }}"></script>
 <script>
@@ -58,7 +112,7 @@ const get_event_card = (preview_image, name, eid, date, genres, price, status) =
     <div class="card card-hover m-1" style="width:30%">
         <img class="card-img-top" src="${preview_image}" alt="Card image">
         <div class="card-body">
-            <a href="./event-details?eid=${eid}" class="event-link stretched-link"><h4>${name}</h4></a>
+            <a href="./event-details/${eid}" class="event-link stretched-link"><h4>${name}</h4></a>
             <div class="row">
                 <div class="col-sm-6">
                     <p class="card-text fw-bold">${formatter.format(date)}</p>

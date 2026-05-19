@@ -1,13 +1,13 @@
 {% extends "base.html" %}
+
 {% block head %}
 <style>
-
 p.event-icon-p {
     line-height: 0.1;
 }
 
 .event-link {
-  text-decoration: none;
+    text-decoration: none;
 }
 
 .select2-container {
@@ -16,116 +16,71 @@ p.event-icon-p {
 }
 
 .select2-selection {
-    height: 38px !important; 
+    height: 38px !important;
     padding: 5px;
     border: 1px solid #dee2e6 !important;
 }
-
-
 </style>
 {% endblock %}
+
 {% block content %}
 
 <div class="p-3">
-    <h2>Events</h2>
+    <h2>My Events</h2>
 
     <div id="events-div">
-        <div id="event-card-1">
-            <div class="modal fade" id="event-edit-modal-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
+        {% for event in events %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <img src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+                                 alt="Image Preview"
+                                 class="img-fluid">
+                        </div>
 
-                <div class="modal-header">
-                    <h4 class="modal-title">Edit Event</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                        <div class="col-sm-9">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="card-title">{{ event.name }}</h4>
+                                    <p class="card-text fw-bold event-icon-p">
+                                        {{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}
+                                    </p>
+                                    <p class="card-text event-icon-p">{{ event.genres }}</p>
+                                    <p class="card-text event-icon-p">${{ "%.2f"|format(event.price) }}</p>
+                                    <p class="card-text event-icon-p">Tickets left: {{ event.tickets_available }}</p>
 
-                <form>
-                <div class="modal-body">
-                    <input type="hidden" name="event_id" value="1">
+                                    <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                                       class="card-link event-link fw-bold">
+                                        View
+                                    </a>
 
-                    <div class="mb-3">
-                        <label for="formFile" class="form-label">Upload Preview</label>
-                        <input class="form-control" type="file" id="formFile" accept="image/*">
-                    </div>
+                                    {% if event.status != "Cancelled" %}
+                                        <form method="POST"
+                                              action="{{ url_for('cancel_event', event_id=event.id) }}"
+                                              style="display:inline;">
+                                            <button type="submit"
+                                                    class="btn btn-link p-0 card-link event-link fw-bold"
+                                                    style="color: red;">
+                                                Cancel
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
 
-                    <label for="event-name" class="form-lable">Event Name:</label>
-                    <input id="event-name" type="text" class="form-control" value="Event Title">
-
-                    <label for="date-picker-1" class="form-lable">Date:</label>
-                    <input type="text" id="date-picker-1" class="form-control">
-
-                    <label for="date-picker" class="form-lable">Date:</label>
-                    <div class="input-group">
-                        <span class="input-group-text">$</span>
-                        <input type="number" class="form-control" id="price-input" value="50">
-                    </div>
-
-                    <label for="genre-input-1" class="form-lable">Genre:</label>
-                    <select id="genre-input-1" class="form-control" name="genres[]" multiple="multiple">
-                        <option>Rock</option>
-                        <option>Metal</option>
-                        <option>Alt</option>
-                    </select>
-                    
-                    <label for="comment">Overview:</label>
-                    <textarea class="form-control" rows="5" id="comment" name="Overview">This is the overview that was set when the event was created. You can edit it by changing this value.</textarea>
-                </div>
-                
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Edit</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                </div>
-                </form>
-
-                </div>
-            </div>
-            </div>
-            <div class="card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <img src="./static/img/event.jpg" alt="Image Preview" class="img-fluid">
-                    </div>
-                    <div class="col-sm-9">
-                        <div class="d-flex">
-                            <div>
-                                <h4 class="card-title">Event Title</h4>
-                                <p class="card-text fw-bold event-icon-p">21 May 2026 at 6:00pm</p>
-                                <p class="card-text event-icon-p">Metal, Rock</p>
-                                <p class="card-text event-icon-p">$50</p>
-                                <a href="#event-edit-modal-1" class="card-link event-link fw-bold" data-bs-toggle="modal">Edit</a>
-                                <a href="#" class="card-link event-link fw-bold" style="color: red">Delete</a>
+                                <div>
+                                    <p class="m-3">{{ event.status }}</p>
+                                    <p class="card-text fw-bold">{{ event.location }}</p>
+                                </div>
                             </div>
-                           <div>
-                                <p class="m-3">OPEN</p>
-                                <p class="card-text fw-bold">Bisbane Entertainment Centre</p>
-                           </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
-        </div>
+        {% else %}
+            <p>You have not created any events yet.</p>
+        {% endfor %}
     </div>
-
 </div>
 
-<script>
-
-// NEEDS TO BE MODIFIED TO HANDLE MULTIPLE CARDS (WILL BE DONE SERVER SIDE)
-flatpickr("#date-picker-1", {
-    minDate: new Date().fp_incr(1),
-    defaultDate: "2026-05-21"
-});
-$(document).ready(function() {
-    $('#genre-input-1').select2({
-        dropdownParent: $("#event-edit-modal-1")
-    });
-
-    $('#genre-input-1').val(['Rock', 'Metal']).trigger('change');
-});
-
-
-</script>
 {% endblock %}
