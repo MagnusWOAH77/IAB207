@@ -1,48 +1,168 @@
 {% extends "base.html" %}
+
 {% block head %}
-    <style>
+<style>
+    p.event-icon-p {
+        line-height: 0.1;
+    }
 
-p.event-icon-p {
-    line-height: 0.1;
-}
+    .card-hover:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease;
+    }
 
-.card-hover:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
-}
+    .card {
+        transition: transform 0.3s ease;
+        border: none;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+    }
 
-.card {
-  transition: transform 0.3s ease;
-}
+    .event-link {
+        text-decoration: none;
+        color: black;
+    }
 
-.event-link {
-  text-decoration: none;
-  color: black;
-}
+    #filter-selector {
+        gap: 1rem;
+    }
 
+    .filter-controls {
+        gap: 0.75rem;
+    }
 
+    .filter-label {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-select {
+        border: 1.5px solid #d1d5db;
+        border-radius: 999px;
+        padding: 0.55rem 2.4rem 0.55rem 1rem;
+        font-weight: 600;
+        color: #0f172a;
+        background-color: #ffffff;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+        cursor: pointer;
+    }
+
+    .filter-select:focus {
+        border-color: #0f2f63;
+        box-shadow: 0 0 0 0.18rem rgba(15, 47, 99, 0.15);
+    }
+
+    .filter-select:disabled {
+        color: #94a3b8;
+        background-color: #f1f5f9;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+
+    .filter-heading {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-panel {
+        background: #ffffff;
+        border-radius: 22px;
+        padding: 1.25rem 1.5rem;
+        margin: 1.5rem 1.5rem 0.75rem 1.5rem;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .order-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+        #filter-selector {
+            flex-direction: column;
+            align-items: flex-start !important;
+        }
+
+        .filter-controls {
+            flex-direction: column;
+            width: 100%;
+            align-items: stretch !important;
+        }
+
+        .filter-group,
+        .order-group {
+            width: 100%;
+        }
+
+        .filter-controls select,
+        .order-group select {
+            width: 100% !important;
+        }
+
+        .card {
+            width: 90% !important;
+        }
+    }
 </style>
-
 {% endblock %}
+
 {% block content %}
 
-<div id="genre-cards" class="d-flex justify-content-around flex-column flex-md-row"></div>
+<div class="filter-panel">
+    <div id="filter-selector" class="d-flex justify-content-between align-items-center">
+        <div class="filter-heading">
+            <h3 id="all-events-title" class="mb-0"></h3>
 
-<hr class="mt-3">
+            <div class="d-flex align-items-end filter-controls">
+                <div class="filter-group">
+                    <span class="filter-label">Genre</span>
+                    <select id="main-genre-filter" class="form-select filter-select" style="width: 170px;">
+                        <option value="all">All Genres</option>
+                        <option value="music">Music</option>
+                        <option value="sports">Sports</option>
+                        <option value="arts">Arts</option>
+                        <option value="food">Food</option>
+                        <option value="community">Community</option>
+                    </select>
+                </div>
 
-<div id="filter-selector" class="d-flex  justify-content-between px-4 pt-4 pb-1">
-    <h3 id="all-events-title"></h3>
-    <select class="form-select" style="width: 15%">
-        <option>Date</option>
-        <option>Price</option>
-        <option>Name</option>
-    </select>
+                <div class="filter-group">
+                    <span class="filter-label">Subgenre</span>
+                    <select id="sub-genre-filter" class="form-select filter-select" style="width: 190px;" disabled>
+                        <option value="all">Subgenre</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-group">
+            <span class="filter-label">Order by</span>
+            <select id="order-by" class="form-select filter-select" style="width: 210px;">
+                <option value="date-asc">Date: Soonest</option>
+                <option value="date-desc">Date: Latest</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+            </select>
+        </div>
+    </div>
 </div>
-<div id="cards" class="d-flex flex-wrap justify-content-center"></div>
+
+<div id="cards" class="d-flex flex-wrap justify-content-center mt-3"></div>
 
 <script src="{{ url_for('static', filename='js/handlers.js') }}"></script>
-<script>
 
+<script>
 const get_event_card = (preview_image, name, eid, date, genres, price, status) => {
     const formatter = new Intl.DateTimeFormat('en-AU', {
         year: 'numeric',
@@ -55,7 +175,7 @@ const get_event_card = (preview_image, name, eid, date, genres, price, status) =
     });
 
     const event_card = `
-    <div class="card card-hover m-1" style="width:30%">
+    <div class="card card-hover m-2" style="width:30%">
         <img class="card-img-top" src="${preview_image}" alt="Card image">
         <div class="card-body">
             <a href="./event-details?eid=${eid}" class="event-link stretched-link"><h4>${name}</h4></a>
@@ -63,61 +183,308 @@ const get_event_card = (preview_image, name, eid, date, genres, price, status) =
                 <div class="col-sm-6">
                     <p class="card-text fw-bold">${formatter.format(date)}</p>
                     <p class="card-text event-icon-p">${genres.join(", ")}</p>
-                    <p class="card-text event-icon-p">$${price}</p>
+                    <p class="card-text event-icon-p">${price === 0 ? "Free" : `AUD ${price}`}</p>
                 </div>
                 <div class="col-sm-6">
                     <p>${status}</p>
-                    <p class="card-text fw-bold">Bisbane Entertainment Centre</p>
+                    <p class="card-text fw-bold">Brisbane Entertainment Centre</p>
                 </div>
             </div>
         </div>
     </div>
     `;
 
-    const template = document.createElement('template');
+    const template = document.createElement("template");
     template.innerHTML = event_card.trim();
     return template.content.firstChild;
-}
+};
 
-const get_genre_card = genre => {
-    const genre_card = `
-    <div class="card card-hover">
-        <a href="./home?genre=${genre}" class="py-4 px-5 event-link stretched-link"><h5>${genre}</h5></a>
-    </div>
-    `;
+const city = "Brisbane";
 
-    const template = document.createElement('template');
-    template.innerHTML = genre_card.trim();
-    return template.content.firstChild;
-}
-
-let city = "Brisbane";
-
-const allEvents_title = document.getElementById("all-events-title")
-allEvents_title.innerText = `All Events in ${city}`;
-
+const allEventsTitle = document.getElementById("all-events-title");
 const cardsDiv = document.getElementById("cards");
-const genreCards = document.getElementById("genre-cards");
-const filterSelector = document.getElementById("filter-selector");
+const mainGenreFilter = document.getElementById("main-genre-filter");
+const subGenreFilter = document.getElementById("sub-genre-filter");
+const orderByDropdown = document.getElementById("order-by");
 
-filterSelector.addEventListener("change", handle_filter_update);
+allEventsTitle.innerText = `All Events in ${city}`;
 
-const genres = ["Metal", "Rock", "Alt", "Rap", "Pop"];
+const genreOptions = {
+    all: [],
+    music: ["Metal", "Rock", "Alt", "Rap", "Pop", "Jazz", "Country", "Electronic"],
+    sports: ["Football", "Basketball", "Running", "Cycling", "Fitness", "Motorsport"],
+    arts: ["Comedy", "Theatre", "Film", "Dance", "Exhibition", "Workshop"],
+    food: ["Food Festival", "Wine", "Markets", "Cooking Class", "Street Food"],
+    community: ["Family", "Charity", "Networking", "Education", "Meetup"]
+};
 
-document.addEventListener("DOMContentLoaded", () => {
-    for (let i = 0; i < 10; i++) {
-        const event = get_event_card("../static/img/event.jpg", "Event " + i.toString(), 1, new Date(2026, 4, 21, 18, 0), ["Metal", "Rock"], 50, "OPEN");
-        cardsDiv.append(event);
+const events = [
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Rock Night",
+        eid: 1,
+        date: new Date(2026, 4, 21, 18, 0),
+        mainGenre: "music",
+        genres: ["Rock"],
+        price: 80,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Metal Fest",
+        eid: 2,
+        date: new Date(2026, 3, 10, 19, 30),
+        mainGenre: "music",
+        genres: ["Metal"],
+        price: 120,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Jazz Evening",
+        eid: 3,
+        date: new Date(2026, 6, 2, 17, 0),
+        mainGenre: "music",
+        genres: ["Jazz"],
+        price: 65,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Electronic Night",
+        eid: 4,
+        date: new Date(2026, 6, 18, 21, 0),
+        mainGenre: "music",
+        genres: ["Electronic"],
+        price: 110,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "City Marathon",
+        eid: 5,
+        date: new Date(2026, 2, 15, 7, 0),
+        mainGenre: "sports",
+        genres: ["Running"],
+        price: 45,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Basketball Finals",
+        eid: 6,
+        date: new Date(2026, 5, 8, 19, 0),
+        mainGenre: "sports",
+        genres: ["Basketball"],
+        price: 95,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Community Fitness Day",
+        eid: 7,
+        date: new Date(2026, 1, 20, 8, 30),
+        mainGenre: "sports",
+        genres: ["Fitness"],
+        price: 0,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Comedy Night",
+        eid: 8,
+        date: new Date(2026, 7, 12, 20, 0),
+        mainGenre: "arts",
+        genres: ["Comedy"],
+        price: 55,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Theatre Showcase",
+        eid: 9,
+        date: new Date(2026, 8, 3, 18, 30),
+        mainGenre: "arts",
+        genres: ["Theatre"],
+        price: 75,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Film Screening",
+        eid: 10,
+        date: new Date(2026, 8, 22, 19, 0),
+        mainGenre: "arts",
+        genres: ["Film"],
+        price: 30,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Street Food Festival",
+        eid: 11,
+        date: new Date(2026, 4, 29, 12, 0),
+        mainGenre: "food",
+        genres: ["Street Food"],
+        price: 25,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Weekend Markets",
+        eid: 12,
+        date: new Date(2026, 3, 27, 9, 0),
+        mainGenre: "food",
+        genres: ["Markets"],
+        price: 10,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Cooking Masterclass",
+        eid: 13,
+        date: new Date(2026, 9, 2, 14, 0),
+        mainGenre: "food",
+        genres: ["Cooking Class"],
+        price: 85,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Business Networking Night",
+        eid: 14,
+        date: new Date(2026, 9, 5, 18, 0),
+        mainGenre: "community",
+        genres: ["Networking"],
+        price: 35,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Charity Family Day",
+        eid: 15,
+        date: new Date(2026, 10, 14, 10, 0),
+        mainGenre: "community",
+        genres: ["Charity", "Family"],
+        price: 0,
+        status: "OPEN"
+    },
+    {
+        preview_image: "../static/img/event.jpg",
+        name: "Education Meetup",
+        eid: 16,
+        date: new Date(2026, 11, 5, 17, 30),
+        mainGenre: "community",
+        genres: ["Education", "Meetup"],
+        price: 20,
+        status: "OPEN"
+    }
+];
+
+const renderEvents = eventList => {
+    cardsDiv.innerHTML = "";
+
+    if (eventList.length === 0) {
+        cardsDiv.innerHTML = `
+            <div class="text-center mt-5">
+                <h5>No events found</h5>
+                <p class="text-muted">Try changing the selected filters.</p>
+            </div>
+        `;
+        return;
     }
 
-    genres.forEach(genre => {
-        genreCards.append(get_genre_card(genre));
-    });
-});
+    eventList.forEach(event => {
+        const eventCard = get_event_card(
+            event.preview_image,
+            event.name,
+            event.eid,
+            event.date,
+            event.genres,
+            event.price,
+            event.status
+        );
 
-{% if current_user.is_authenticated %}
-    console.log("User is authenticated {{ current_user.username }}");
-{% endif %}
+        cardsDiv.append(eventCard);
+    });
+};
+
+const updateSubgenreOptions = () => {
+    const selectedMainGenre = mainGenreFilter.value;
+    const selectedMainGenreText = mainGenreFilter.options[mainGenreFilter.selectedIndex].text;
+    const subgenres = genreOptions[selectedMainGenre];
+
+    subGenreFilter.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "all";
+    defaultOption.textContent = selectedMainGenre === "all" ? "Subgenre" : `All ${selectedMainGenreText}`;
+    subGenreFilter.append(defaultOption);
+
+    if (selectedMainGenre === "all") {
+        subGenreFilter.disabled = true;
+        subGenreFilter.value = "all";
+        return;
+    }
+
+    subGenreFilter.disabled = false;
+
+    subgenres.forEach(subgenre => {
+        const option = document.createElement("option");
+        option.value = subgenre;
+        option.textContent = subgenre;
+        subGenreFilter.append(option);
+    });
+
+    subGenreFilter.value = "all";
+};
+
+const applyFiltersAndSort = () => {
+    const selectedMainGenre = mainGenreFilter.value;
+    const selectedSubGenre = subGenreFilter.value;
+    const selectedOrder = orderByDropdown.value;
+
+    let filteredEvents = [...events];
+
+    if (selectedMainGenre !== "all") {
+        filteredEvents = filteredEvents.filter(event => event.mainGenre === selectedMainGenre);
+    }
+
+    if (selectedMainGenre !== "all" && selectedSubGenre !== "all") {
+        filteredEvents = filteredEvents.filter(event => event.genres.includes(selectedSubGenre));
+    }
+
+    if (selectedOrder === "date-asc") {
+        filteredEvents.sort((a, b) => a.date - b.date);
+    }
+
+    if (selectedOrder === "date-desc") {
+        filteredEvents.sort((a, b) => b.date - a.date);
+    }
+
+    if (selectedOrder === "price-asc") {
+        filteredEvents.sort((a, b) => a.price - b.price);
+    }
+
+    if (selectedOrder === "price-desc") {
+        filteredEvents.sort((a, b) => b.price - a.price);
+    }
+
+    renderEvents(filteredEvents);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateSubgenreOptions();
+    applyFiltersAndSort();
+
+    mainGenreFilter.addEventListener("change", () => {
+        updateSubgenreOptions();
+        applyFiltersAndSort();
+    });
+
+    subGenreFilter.addEventListener("change", applyFiltersAndSort);
+    orderByDropdown.addEventListener("change", applyFiltersAndSort);
+});
 </script>
 
 {% endblock %}
