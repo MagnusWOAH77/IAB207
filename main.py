@@ -2,7 +2,8 @@ from flask import Flask, abort, redirect, render_template, url_for, request, fla
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
-from flask_login import LoginManager, login_user, login_required, current_user
+from werkzeug.utils import secure_filename
+from flask_login import LoginManager, login_user, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from user import User
@@ -16,6 +17,7 @@ from forms.login import LoginForm
 
 from forms.event import EventForm
 from database.Event import Event
+import os
 
 import bcrypt
 
@@ -27,6 +29,7 @@ login_manager.init_app(app)
 login_manager.login_view = "login_page"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.db"
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 db.init_app(app)
 
 with app.app_context():
@@ -72,6 +75,8 @@ def create_event_page():
     if form.validate_on_submit():
         event_datetime = datetime.strptime(form.event_datetime.data, "%Y-%m-%d %H:%M")
 
+        print("Processing Form")
+
         event = Event(
             name=form.name.data,
             event_datetime=event_datetime,
@@ -91,14 +96,26 @@ def create_event_page():
         db.session.add(event)
         db.session.commit()
 
+        thumbnail = form.image.data
+        _, extension = os.path.splitext(secure_filename(thumbnail.filename))
+        thumbnail_name = str(event.id) + extension
+        thumbnail_filepath = os.path.join(app.config['UPLOAD_FOLDER'], thumbnail_name)
+        thumbnail.save(thumbnail_filepath)
+
+        event.image_filename = thumbnail_name
+        db.session.commit()
+
         flash("Event created successfully.", "success")
         return redirect(url_for("event_details_page", event_id=event.id))
+    else:
+        print(form.errors)
 
     return render_template("event-create.html", title="Create Event", form=form)
 
 @app.route("/event-details/<int:event_id>", methods=["GET", "POST"])
 def event_details_page(event_id):
     event = db.get_or_404(Event, event_id)
+    print(event.image_filename)
 
     event.update_status()
     db.session.commit()
@@ -179,8 +196,8 @@ def signup_page():
 
 @app.route("/login", methods=["GET", "POST"])
 def login_page():
-    form = LoginForm()
 
+    form = LoginForm()
     # form handler
     if form.validate_on_submit():
 
@@ -196,6 +213,13 @@ def login_page():
         login_user(User(user.id, user.username, user.password))
         return redirect(url_for("index"))
     return render_template("login.html", title="Login", form=form)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("You have been logged out")
+    return redirect(url_for("login_page"))
 
 if __name__ == "__main__":
     app.run(debug=True)

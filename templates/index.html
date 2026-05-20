@@ -181,7 +181,7 @@
     {% for event in events %}
         <div class="card card-hover m-1" style="width:30%">
             <img class="card-img-top"
-                 src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+                 src="{{ url_for('static', filename='uploads/' ~ (event.image_filename or 'event.jpg')) }}"
                  alt="Card image">
 
             <div class="card-body">
@@ -219,7 +219,7 @@ const city = "Brisbane";
 const events = [
     {% for event in events %}
     {
-        preview_image: "{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}",
+        preview_image: "{{ url_for('static', filename='uploads/' ~ (event.image_filename or 'event.jpg')) }}",
         name: {{ event.name|tojson }},
         eid: {{ event.id|tojson }},
         date: new Date({{ event.event_datetime.isoformat()|tojson }}),
