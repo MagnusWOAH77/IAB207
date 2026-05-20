@@ -1,114 +1,53 @@
 {% extends "base.html" %}
+
 {% block head %}
 <style>
-
 .event-details {
-    line-height: 0.2;
-}
-
-.collapse-content.collapse:not(.show) {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Show 3 lines */
-    line-clamp: 3;
-    -webkit-box-orient: vertical;  
-    overflow: hidden;
+    line-height: 1.2;
 }
 
 .input-no-underline {
     text-decoration: none;
 }
-
 </style>
 {% endblock %}
+
 {% block content %}
 
-<div class="row">
+<div class="row p-3">
     <div class="col-sm-6">
-        <img src="./static/img/event.jpg" class="rounded img-fluid m-2" alt="Event Preview">
+        <img src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+             class="rounded img-fluid m-2"
+             alt="Event Preview">
     </div>
+
     <div class="col-sm-6 event-details">
-        <h2 id="event-title">Event Name</h2>
-        <h3 id="event-status">OPEN</h3>
-        <h4 id="event-date">21 May 2026 at 6:00pm</h4>
-        <h4 id="event-date">$50</h4>
-        <p id="event-genres">Metal Rock</p>
-        <p>Tickets Left: 25</p>
-        <button class="btn btn-success">Book</button>
+        <h2>{{ event.name }}</h2>
+        <h3>{{ event.status }}</h3>
+        <h4>{{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}</h4>
+        <h4>${{ "%.2f"|format(event.price) }}</h4>
+        <p>{{ event.genres }}</p>
+        <p>Tickets Left: {{ event.tickets_available }}</p>
+
+        <p>booking goes here</p>
     </div>
 </div>
+
 <div class="container m-3">
     <h2>Overview</h2>
+    <p>{{ event.overview }}</p>
 
-    <!-- Always visible part -->
-    <div>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel metus consequat diam pretium tristique. Mauris malesuada faucibus mauris, id malesuada magna pharetra sit amet. In ipsum tortor, accumsan fermentum varius sed, eleifend ut magna. Sed in mattis quam. Nullam tellus lorem, cursus eu luctus non, congue at ante. Nunc id sollicitudin enim, et lobortis nisl. In ut velit fermentum, accumsan est id, vehicula nulla. Quisque vel congue elit, sed pharetra metus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
-    </div>
-    <!-- Show more part -->
-    <div class="collapse" id="overview-collapse">
-        Duis vitae elementum neque, at posuere metus. Maecenas vehicula sodales diam, eu laoreet lacus vestibulum et. Curabitur cursus, urna sit amet tincidunt porttitor, eros massa mattis ipsum, vel cursus metus nulla eget sapien. Vivamus elementum ac ipsum sit amet aliquet. Integer consectetur lacinia sagittis. Suspendisse ornare condimentum accumsan. Nullam in tellus et leo tempus vestibulum sit amet at leo. Ut non dui a quam eleifend euismod sit amet eget elit. Cras iaculis suscipit lorem, non congue augue euismod eleifend. Integer varius, dolor et blandit mollis, tellus diam dapibus lacus, semper efficitur eros purus vitae felis. Vivamus sed ullamcorper est, eget finibus lacus. Etiam nec consequat nulla. Aliquam imperdiet consectetur justo a accumsan.
-
-    Nulla ullamcorper est ut aliquet pulvinar. Pellentesque suscipit imperdiet enim, in malesuada turpis laoreet eu. Pellentesque mauris ipsum, venenatis ac euismod at, dictum a elit. Proin sollicitudin nibh vel mollis ornare. Donec vitae purus egestas, pellentesque lacus eu, pretium ipsum. Curabitur vel libero mi. Nulla facilisi. Aliquam eget mollis enim. Aliquam erat volutpat. Vivamus maximus tincidunt tortor vel venenatis. Curabitur sodales laoreet neque et placerat.
-
-    Proin mattis metus non lorem faucibus vestibulum. In ac facilisis augue. Maecenas quis nibh iaculis diam facilisis finibus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin vel finibus felis. Curabitur ut ligula neque. Maecenas sed faucibus leo. Phasellus nisi nisl, commodo vel bibendum non, hendrerit vel est. Quisque quis ultricies velit. Aenean risus dui, iaculis pellentesque tellus eget, iaculis tempor enim. Curabitur a maximus sapien. Etiam a laoreet est.
-
-    Quisque eget finibus massa. Aliquam eleifend augue eu sapien ullamcorper, at gravida risus mollis. Sed suscipit nisl augue, et mollis enim finibus ac. Duis non odio nisl. Maecenas semper id libero eget convallis. Fusce eu leo vehicula lorem ornare feugiat ut vitae enim. Aliquam rutrum augue eget odio lobortis facilisis. Phasellus finibus, ipsum nec tempor viverra, felis arcu suscipit enim, eget mattis odio nibh ut diam. Mauris efficitur, augue sit amet aliquam porttitor, quam metus venenatis libero, id gravida sapien enim eu felis. Nullam eget pharetra eros. Aliquam non ante eu risus gravida fermentum. Aliquam auctor, magna id efficitur tempor, urna lacus mollis arcu, non placerat massa mi id nibh. Proin ipsum velit, auctor id metus ut, vulputate convallis odio. Morbi ex lorem, maximus a auctor eu, molestie ac risus. Donec nec quam elit. 
-    </div>
-    <a id="show-more-btn" class="show-more-btn fw-bold input-no-underline" data-bs-toggle="collapse" href="#overview-collapse" role="button" aria-expanded="false" aria-controls="overview-collapse">Show more</a>
+    {% if event.acknowledgement_type != "None" %}
+        <h2>Acknowledgement of Country</h2>
+        <p><strong>{{ event.acknowledgement_type }}</strong></p>
+        <p>{{ event.acknowledgement_text }}</p>
+    {% endif %}
 
     <h2 class="mt-3">Comments</h2>
-    <div id="comments-div">
-        <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">User1</h4>
-            <p class="card-text">I am really excited to see this show live!!!</p>
-            <a class="card-link input-no-underline fw-bold" data-bs-toggle="collapse" href="#comment-1-collapse" role="button" aria-expanded="false" aria-controls="comment-1-collapse">Reply</a>
-            <a class="card-link input-no-underline fw-bold" data-bs-toggle="collapse" href="#sub-comments-1-collapse" role="button" aria-expanded="false" aria-controls="sub-comments-1-collapse">See Replies</a>
 
-            <!-- Replace 1 with the id -->
-            <div class="collapse" id="comment-1-collapse">
-                <form>
-                    <div class="mb-3 mt-3">
-                    <label for="comment">Comment:</label>
-                    <textarea class="form-control" rows="5" id="comment" name="text"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
+    <div id="comments-div" class="mt-3">
 
-            <div class="collapse" id="sub-comments-1-collapse">
-                <div class="card mt-3">
-                <div class="card-body">
-                    <h5 class="card-title">User2</h5>
-                    <p class="card-text">Me Too</p>
-                </div>
-                </div>
-
-                <div class="card mt-3">
-                <div class="card-body">
-                    <h5 class="card-title">This User</h5>
-                    <p class="card-text">Me Too</p>
-                    <a href="#" class="card-link input-no-underline fw-bold">Delete</a>
-                </div>
-                </div>
-            </div>
-        </div>
-        </div>
     </div>
-
 </div>
 
-<script>
-
-const showMoreBTN = document.getElementById("show-more-btn");
-
-let showMoreState = true;
-showMoreBTN.addEventListener("click", () => {
-    showMoreState = !showMoreState;
-    const text = showMoreState ? "Show more" : "Show Less";
-    console.log(text);
-    
-    showMoreBTN.innerText = text;
-});
-
-</script>
 {% endblock %}

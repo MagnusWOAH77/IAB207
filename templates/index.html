@@ -122,18 +122,24 @@
 <div class="filter-panel">
     <div id="filter-selector" class="d-flex justify-content-between align-items-center">
         <div class="filter-heading">
-            <h3 id="all-events-title" class="mb-0"></h3>
+            <h3 id="all-events-title" class="mb-0">
+                {% if selected_genre %}
+                    {{ selected_genre }} Events in Brisbane
+                {% else %}
+                    All Events in Brisbane
+                {% endif %}
+            </h3>
 
             <div class="d-flex align-items-end filter-controls">
                 <div class="filter-group">
                     <span class="filter-label">Genre</span>
                     <select id="main-genre-filter" class="form-select filter-select" style="width: 170px;">
-                        <option value="all">All Genres</option>
-                        <option value="music">Music</option>
-                        <option value="sports">Sports</option>
-                        <option value="arts">Arts</option>
-                        <option value="food">Food</option>
-                        <option value="community">Community</option>
+                        <option value="all" {% if not selected_genre %}selected{% endif %}>All Genres</option>
+                        {% for genre in genres %}
+                            <option value="{{ genre|lower }}" {% if selected_genre and selected_genre|lower == genre|lower %}selected{% endif %}>
+                                {{ genre }}
+                            </option>
+                        {% endfor %}
                     </select>
                 </div>
 
@@ -153,17 +159,105 @@
                 <option value="date-desc">Date: Latest</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
             </select>
         </div>
     </div>
 </div>
 
-<div id="cards" class="d-flex flex-wrap justify-content-center mt-3"></div>
+<div id="genre-cards" class="d-flex justify-content-around flex-column flex-md-row">
+    {% for genre in genres %}
+        <div class="card card-hover">
+            <a href="#" data-genre="{{ genre|lower }}" class="genre-card-link py-4 px-5 event-link stretched-link">
+                <h5>{{ genre }}</h5>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+<hr class="mt-3">
+
+<div id="cards" class="d-flex flex-wrap justify-content-center">
+    {% for event in events %}
+        <div class="card card-hover m-1" style="width:30%">
+            <img class="card-img-top"
+                 src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+                 alt="Card image">
+
+            <div class="card-body">
+                <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                   class="event-link stretched-link">
+                    <h4>{{ event.name }}</h4>
+                </a>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p class="card-text fw-bold">
+                            {{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}
+                        </p>
+                        <p class="card-text event-icon-p">{{ event.genres }}</p>
+                        <p class="card-text event-icon-p">${{ "%.2f"|format(event.price) }}</p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <p>{{ event.status }}</p>
+                        <p class="card-text fw-bold">{{ event.location }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="m-4">No events found.</p>
+    {% endfor %}
+</div>
 
 <script src="{{ url_for('static', filename='js/handlers.js') }}"></script>
 
 <script>
-const get_event_card = (preview_image, name, eid, date, genres, price, status) => {
+const city = "Brisbane";
+
+const events = [
+    {% for event in events %}
+    {
+        preview_image: "{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}",
+        name: {{ event.name|tojson }},
+        eid: {{ event.id|tojson }},
+        date: new Date({{ event.event_datetime.isoformat()|tojson }}),
+        genreText: {{ event.genres|string|tojson }},
+        price: {{ (event.price if event.price is not none else 0)|tojson }},
+        status: {{ event.status|string|tojson }},
+        location: {{ event.location|string|tojson }}
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+const genreOptions = {
+    all: [],
+    music: ["Metal", "Rock", "Alt", "Rap", "Pop", "Jazz", "Country", "Electronic"],
+    sports: ["Football", "Basketball", "Running", "Cycling", "Fitness", "Motorsport"],
+    arts: ["Comedy", "Theatre", "Film", "Dance", "Exhibition", "Workshop"],
+    food: ["Food Festival", "Wine", "Markets", "Cooking Class", "Street Food"],
+    community: ["Family", "Charity", "Networking", "Education", "Meetup"]
+};
+
+const allEventsTitle = document.getElementById("all-events-title");
+const cardsDiv = document.getElementById("cards");
+const mainGenreFilter = document.getElementById("main-genre-filter");
+const subGenreFilter = document.getElementById("sub-genre-filter");
+const orderByDropdown = document.getElementById("order-by");
+
+const normaliseGenres = genreText => {
+    if (!genreText) {
+        return [];
+    }
+
+    return genreText
+        .split(",")
+        .map(genre => genre.trim())
+        .filter(Boolean);
+};
+
+const get_event_card = event => {
     const formatter = new Intl.DateTimeFormat('en-AU', {
         year: 'numeric',
         month: 'long',
@@ -174,20 +268,24 @@ const get_event_card = (preview_image, name, eid, date, genres, price, status) =
         timeZone: 'Australia/Brisbane'
     });
 
+    const priceText = Number(event.price) === 0 ? "Free" : `$${Number(event.price).toFixed(2)}`;
+    const eventDetailsBaseUrl = "{{ url_for('event_details_page', event_id=0) }}";
+    const eventDetailsUrl = eventDetailsBaseUrl.replace("0", event.eid);
+
     const event_card = `
-    <div class="card card-hover m-2" style="width:30%">
-        <img class="card-img-top" src="${preview_image}" alt="Card image">
+    <div class="card card-hover m-1" style="width:30%">
+        <img class="card-img-top" src="${event.preview_image}" alt="Card image">
         <div class="card-body">
-            <a href="./event-details?eid=${eid}" class="event-link stretched-link"><h4>${name}</h4></a>
+            <a href="${eventDetailsUrl}" class="event-link stretched-link"><h4>${event.name}</h4></a>
             <div class="row">
                 <div class="col-sm-6">
-                    <p class="card-text fw-bold">${formatter.format(date)}</p>
-                    <p class="card-text event-icon-p">${genres.join(", ")}</p>
-                    <p class="card-text event-icon-p">${price === 0 ? "Free" : `AUD ${price}`}</p>
+                    <p class="card-text fw-bold">${formatter.format(event.date)}</p>
+                    <p class="card-text event-icon-p">${normaliseGenres(event.genreText).join(", ")}</p>
+                    <p class="card-text event-icon-p">${priceText}</p>
                 </div>
                 <div class="col-sm-6">
-                    <p>${status}</p>
-                    <p class="card-text fw-bold">Brisbane Entertainment Centre</p>
+                    <p>${event.status}</p>
+                    <p class="card-text fw-bold">${event.location}</p>
                 </div>
             </div>
         </div>
@@ -199,187 +297,14 @@ const get_event_card = (preview_image, name, eid, date, genres, price, status) =
     return template.content.firstChild;
 };
 
-const city = "Brisbane";
+const updateTitle = () => {
+    const selectedMainGenre = mainGenreFilter.value;
+    const selectedMainGenreText = mainGenreFilter.options[mainGenreFilter.selectedIndex].text;
 
-const allEventsTitle = document.getElementById("all-events-title");
-const cardsDiv = document.getElementById("cards");
-const mainGenreFilter = document.getElementById("main-genre-filter");
-const subGenreFilter = document.getElementById("sub-genre-filter");
-const orderByDropdown = document.getElementById("order-by");
-
-allEventsTitle.innerText = `All Events in ${city}`;
-
-const genreOptions = {
-    all: [],
-    music: ["Metal", "Rock", "Alt", "Rap", "Pop", "Jazz", "Country", "Electronic"],
-    sports: ["Football", "Basketball", "Running", "Cycling", "Fitness", "Motorsport"],
-    arts: ["Comedy", "Theatre", "Film", "Dance", "Exhibition", "Workshop"],
-    food: ["Food Festival", "Wine", "Markets", "Cooking Class", "Street Food"],
-    community: ["Family", "Charity", "Networking", "Education", "Meetup"]
+    allEventsTitle.innerText = selectedMainGenre === "all"
+        ? `All Events in ${city}`
+        : `${selectedMainGenreText} Events in ${city}`;
 };
-
-const events = [
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Rock Night",
-        eid: 1,
-        date: new Date(2026, 4, 21, 18, 0),
-        mainGenre: "music",
-        genres: ["Rock"],
-        price: 80,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Metal Fest",
-        eid: 2,
-        date: new Date(2026, 3, 10, 19, 30),
-        mainGenre: "music",
-        genres: ["Metal"],
-        price: 120,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Jazz Evening",
-        eid: 3,
-        date: new Date(2026, 6, 2, 17, 0),
-        mainGenre: "music",
-        genres: ["Jazz"],
-        price: 65,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Electronic Night",
-        eid: 4,
-        date: new Date(2026, 6, 18, 21, 0),
-        mainGenre: "music",
-        genres: ["Electronic"],
-        price: 110,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "City Marathon",
-        eid: 5,
-        date: new Date(2026, 2, 15, 7, 0),
-        mainGenre: "sports",
-        genres: ["Running"],
-        price: 45,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Basketball Finals",
-        eid: 6,
-        date: new Date(2026, 5, 8, 19, 0),
-        mainGenre: "sports",
-        genres: ["Basketball"],
-        price: 95,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Community Fitness Day",
-        eid: 7,
-        date: new Date(2026, 1, 20, 8, 30),
-        mainGenre: "sports",
-        genres: ["Fitness"],
-        price: 0,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Comedy Night",
-        eid: 8,
-        date: new Date(2026, 7, 12, 20, 0),
-        mainGenre: "arts",
-        genres: ["Comedy"],
-        price: 55,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Theatre Showcase",
-        eid: 9,
-        date: new Date(2026, 8, 3, 18, 30),
-        mainGenre: "arts",
-        genres: ["Theatre"],
-        price: 75,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Film Screening",
-        eid: 10,
-        date: new Date(2026, 8, 22, 19, 0),
-        mainGenre: "arts",
-        genres: ["Film"],
-        price: 30,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Street Food Festival",
-        eid: 11,
-        date: new Date(2026, 4, 29, 12, 0),
-        mainGenre: "food",
-        genres: ["Street Food"],
-        price: 25,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Weekend Markets",
-        eid: 12,
-        date: new Date(2026, 3, 27, 9, 0),
-        mainGenre: "food",
-        genres: ["Markets"],
-        price: 10,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Cooking Masterclass",
-        eid: 13,
-        date: new Date(2026, 9, 2, 14, 0),
-        mainGenre: "food",
-        genres: ["Cooking Class"],
-        price: 85,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Business Networking Night",
-        eid: 14,
-        date: new Date(2026, 9, 5, 18, 0),
-        mainGenre: "community",
-        genres: ["Networking"],
-        price: 35,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Charity Family Day",
-        eid: 15,
-        date: new Date(2026, 10, 14, 10, 0),
-        mainGenre: "community",
-        genres: ["Charity", "Family"],
-        price: 0,
-        status: "OPEN"
-    },
-    {
-        preview_image: "../static/img/event.jpg",
-        name: "Education Meetup",
-        eid: 16,
-        date: new Date(2026, 11, 5, 17, 30),
-        mainGenre: "community",
-        genres: ["Education", "Meetup"],
-        price: 20,
-        status: "OPEN"
-    }
-];
 
 const renderEvents = eventList => {
     cardsDiv.innerHTML = "";
@@ -395,24 +320,14 @@ const renderEvents = eventList => {
     }
 
     eventList.forEach(event => {
-        const eventCard = get_event_card(
-            event.preview_image,
-            event.name,
-            event.eid,
-            event.date,
-            event.genres,
-            event.price,
-            event.status
-        );
-
-        cardsDiv.append(eventCard);
+        cardsDiv.append(get_event_card(event));
     });
 };
 
 const updateSubgenreOptions = () => {
     const selectedMainGenre = mainGenreFilter.value;
     const selectedMainGenreText = mainGenreFilter.options[mainGenreFilter.selectedIndex].text;
-    const subgenres = genreOptions[selectedMainGenre];
+    const subgenres = genreOptions[selectedMainGenre] || [];
 
     subGenreFilter.innerHTML = "";
 
@@ -421,7 +336,7 @@ const updateSubgenreOptions = () => {
     defaultOption.textContent = selectedMainGenre === "all" ? "Subgenre" : `All ${selectedMainGenreText}`;
     subGenreFilter.append(defaultOption);
 
-    if (selectedMainGenre === "all") {
+    if (selectedMainGenre === "all" || subgenres.length === 0) {
         subGenreFilter.disabled = true;
         subGenreFilter.value = "all";
         return;
@@ -431,7 +346,7 @@ const updateSubgenreOptions = () => {
 
     subgenres.forEach(subgenre => {
         const option = document.createElement("option");
-        option.value = subgenre;
+        option.value = subgenre.toLowerCase();
         option.textContent = subgenre;
         subGenreFilter.append(option);
     });
@@ -447,11 +362,15 @@ const applyFiltersAndSort = () => {
     let filteredEvents = [...events];
 
     if (selectedMainGenre !== "all") {
-        filteredEvents = filteredEvents.filter(event => event.mainGenre === selectedMainGenre);
+        filteredEvents = filteredEvents.filter(event =>
+            event.genreText.toLowerCase().includes(selectedMainGenre)
+        );
     }
 
     if (selectedMainGenre !== "all" && selectedSubGenre !== "all") {
-        filteredEvents = filteredEvents.filter(event => event.genres.includes(selectedSubGenre));
+        filteredEvents = filteredEvents.filter(event =>
+            event.genreText.toLowerCase().includes(selectedSubGenre)
+        );
     }
 
     if (selectedOrder === "date-asc") {
@@ -463,13 +382,18 @@ const applyFiltersAndSort = () => {
     }
 
     if (selectedOrder === "price-asc") {
-        filteredEvents.sort((a, b) => a.price - b.price);
+        filteredEvents.sort((a, b) => Number(a.price) - Number(b.price));
     }
 
     if (selectedOrder === "price-desc") {
-        filteredEvents.sort((a, b) => b.price - a.price);
+        filteredEvents.sort((a, b) => Number(b.price) - Number(a.price));
     }
 
+    if (selectedOrder === "name-asc") {
+        filteredEvents.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    updateTitle();
     renderEvents(filteredEvents);
 };
 
@@ -484,6 +408,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     subGenreFilter.addEventListener("change", applyFiltersAndSort);
     orderByDropdown.addEventListener("change", applyFiltersAndSort);
+
+    document.querySelectorAll(".genre-card-link").forEach(link => {
+        link.addEventListener("click", event => {
+            event.preventDefault();
+            mainGenreFilter.value = link.dataset.genre;
+            updateSubgenreOptions();
+            applyFiltersAndSort();
+        });
+    });
 });
 </script>
 
