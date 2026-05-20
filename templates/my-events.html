@@ -34,7 +34,7 @@ p.event-icon-p {
                 <div class="card-body">
                     <div class="row">
                         <div class="col-sm-3">
-                            <img src="{{ url_for('static', filename='img/' ~ (event.image_filename or 'event.jpg')) }}"
+                            <img src="{{ url_for('static', filename='uploads/' ~ (event.image_filename or 'event.jpg')) }}"
                                  alt="Image Preview"
                                  class="img-fluid">
                         </div>

@@ -1,12 +1,18 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, DecimalField, IntegerField, SelectMultipleField, SelectField, SubmitField
 from wtforms.validators import DataRequired, NumberRange
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 
 class EventForm(FlaskForm):
     name = StringField("Event Name", validators=[DataRequired()])
     event_datetime = StringField("Date and Time", validators=[DataRequired()])
     location = StringField("Location", validators=[DataRequired()])
+
+    image = FileField("Upload Image", validators=[
+        FileRequired(),
+        FileAllowed(['jpg', 'png', 'jpeg'], 'Images only (.jpg, .png)!')
+    ])
 
     genres = SelectMultipleField(
         "Genres",
