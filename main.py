@@ -14,9 +14,12 @@ from datetime import datetime
 
 from forms.signup import SignupForm
 from forms.login import LoginForm
+from forms.comment import CommentForm
 
 from forms.event import EventForm
 from database.Event import Event
+from database.Comments import Comments
+
 import os
 
 import bcrypt
@@ -114,22 +117,58 @@ def create_event_page():
 
 @app.route("/event-details/<int:event_id>", methods=["GET", "POST"])
 def event_details_page(event_id):
+
+    # TODO - booking form
+    # booking_form = BookingForm()
+    comment_form = CommentForm()
+
+    if comment_form.validate_on_submit():
+
+        comment = Comments(
+            event_id=event_id,
+            user_id=current_user.user_id,
+            text=comment_form.comment.data
+        )
+
+        db.session.add(comment)
+        db.session.commit()
+
+
     event = db.get_or_404(Event, event_id)
     print(event.image_filename)
 
     event.update_status()
     db.session.commit()
 
-    # TODO - booking form
-    # booking_form = BookingForm()
-    # comment_form = CommentForm()
-
+    comments = db.session.execute(
+        db.select(Comments, DBUser)
+        .join(DBUser)
+        .where(Comments.user_id == DBUser.id)
+        .where(Comments.event_id == int(event_id))
+        .order_by(Comments.created_at)
+    ).all()
 
     return render_template(
         "event-details.html",
         title=event.name,
-        event=event
+        event=event,
+        comments=comments,
+        comment_form=comment_form
     )
+
+@app.route("/delete_comment<int:comment_id>", methods=["GET"])
+def delete_comment(comment_id):
+
+    if not current_user.is_authenticated:
+        return redirect(request.referrer or url_for('index'))
+
+    comment = db.session.get(Comments, comment_id)
+
+    if comment.user_id == current_user.user_id:
+        db.session.delete(comment)
+        db.session.commit()
+
+    return redirect(request.referrer or url_for('index'))
 
 @app.route("/my-events")
 @login_required
@@ -180,8 +219,6 @@ def signup_page():
         
         # hash password
         password_hash = bcrypt.hashpw(form.password.data.encode("utf-8"), bcrypt.gensalt())
-
-        print()
 
         # create user
         user = DBUser(username=form.username.data, password=password_hash.decode("utf-8"))
