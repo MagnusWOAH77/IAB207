@@ -2,84 +2,462 @@
 
 {% block head %}
 <style>
-p.event-icon-p {
-    line-height: 0.1;
-}
+    .my-events-page {
+        min-height: 100vh;
+        background: #f8fafc;
+        padding-bottom: 3rem;
+    }
 
-.event-link {
-    text-decoration: none;
-}
+    .my-events-hero {
+        background:
+            radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.12), transparent 28%),
+            radial-gradient(circle at 85% 75%, rgba(59, 130, 246, 0.24), transparent 32%),
+            linear-gradient(135deg, #07111f 0%, #0f2f63 48%, #123f7a 100%);
+        color: #ffffff;
+        padding: 3rem 1.5rem 5.3rem;
+        margin-bottom: -3.5rem;
+    }
 
-.select2-container {
-    display: block;
-    width: 100% !important;
-}
+    .my-events-hero-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+    }
 
-.select2-selection {
-    height: 38px !important;
-    padding: 5px;
-    border: 1px solid #dee2e6 !important;
-}
+    .my-events-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #dbeafe;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .my-events-title {
+        font-size: clamp(2rem, 4vw, 3.3rem);
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        margin-bottom: 0.7rem;
+    }
+
+    .my-events-subtitle {
+        max-width: 620px;
+        color: #dbeafe;
+        font-size: 1.02rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .my-events-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .events-list {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .event-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 26px;
+        overflow: hidden;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .event-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 56px rgba(15, 23, 42, 0.16);
+    }
+
+    .event-card-inner {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 220px;
+    }
+
+    .event-image-wrap {
+        position: relative;
+        overflow: hidden;
+        background: #e2e8f0;
+    }
+
+    .event-image {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        object-fit: cover;
+        transition: transform 0.25s ease;
+    }
+
+    .event-card:hover .event-image {
+        transform: scale(1.04);
+    }
+
+    .event-content {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .event-main {
+        min-width: 0;
+    }
+
+    .event-name {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.9rem;
+        line-height: 1.25;
+    }
+
+    .event-meta {
+        display: grid;
+        gap: 0.55rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .meta-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.55rem;
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.45;
+    }
+
+    .meta-icon {
+        color: #0f2f63;
+        font-size: 1rem;
+        margin-top: 0.1rem;
+        flex-shrink: 0;
+    }
+
+    .price-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0f2f63;
+        font-weight: 800;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.9rem;
+        width: fit-content;
+    }
+
+    .event-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .view-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #0f2f63;
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        padding: 0.65rem 1.1rem;
+        transition: 0.2s ease;
+        position: relative;
+        z-index: 2;
+    }
+
+    .view-link:hover {
+        background: #0b234a;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .cancel-form {
+        display: inline;
+        position: relative;
+        z-index: 2;
+    }
+
+    .cancel-button {
+        border: none;
+        border-radius: 999px;
+        background: #fee2e2;
+        color: #b91c1c;
+        font-weight: 800;
+        padding: 0.65rem 1.1rem;
+        transition: 0.2s ease;
+    }
+
+    .cancel-button:hover {
+        background: #dc2626;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .event-side {
+        min-width: 190px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.75rem;
+        text-align: right;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 0.42rem 0.85rem;
+        background: #e0f2fe;
+        color: #075985;
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .status-pill.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .location-box {
+        color: #0f172a;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .tickets-box {
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 0.9rem;
+        color: #475569;
+        font-weight: 700;
+    }
+
+    .empty-state {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 1rem;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #0f2f63;
+        font-size: 1.7rem;
+    }
+
+    .empty-state h3 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        margin-bottom: 0.45rem;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        margin-bottom: 1.3rem;
+    }
+
+    .empty-create-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #0f2f63;
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        transition: 0.2s ease;
+    }
+
+    .empty-create-link:hover {
+        background: #0b234a;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 900px) {
+        .event-card-inner {
+            grid-template-columns: 1fr;
+        }
+
+        .event-image {
+            height: 230px;
+            min-height: 230px;
+        }
+
+        .event-content {
+            flex-direction: column;
+        }
+
+        .event-side {
+            align-items: flex-start;
+            text-align: left;
+            min-width: unset;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .my-events-hero {
+            padding: 2.4rem 1rem 5rem;
+        }
+
+        .event-content {
+            padding: 1.25rem;
+        }
+
+        .event-name {
+            font-size: 1.25rem;
+        }
+
+        .event-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .view-link,
+        .cancel-button,
+        .cancel-form {
+            width: 100%;
+        }
+
+        .cancel-button {
+            display: block;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="p-3">
-    <h2>My Events</h2>
+<div class="my-events-page">
 
-    <div id="events-div">
-        {% for event in events %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-sm-3">
+    <section class="my-events-hero">
+        <div class="my-events-hero-inner">
+            <div class="my-events-kicker">My Events</div>
+            <h1 class="my-events-title">Events you created</h1>
+            <p class="my-events-subtitle">
+                View and manage the events you have added to the platform.
+            </p>
+        </div>
+    </section>
+
+    <div class="my-events-shell">
+        <div id="events-div" class="events-list">
+            {% for event in events %}
+                <div class="event-card">
+                    <div class="event-card-inner">
+                        <div class="event-image-wrap">
                             <img src="{{ url_for('static', filename='uploads/' ~ (event.image_filename or 'event.jpg')) }}"
                                  alt="Image Preview"
-                                 class="img-fluid">
+                                 class="event-image">
                         </div>
 
-                        <div class="col-sm-9">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <h4 class="card-title">{{ event.name }}</h4>
-                                    <p class="card-text fw-bold event-icon-p">
-                                        {{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}
-                                    </p>
-                                    <p class="card-text event-icon-p">{{ event.genres }}</p>
-                                    <p class="card-text event-icon-p">${{ "%.2f"|format(event.price) }}</p>
-                                    <p class="card-text event-icon-p">Tickets left: {{ event.tickets_available }}</p>
+                        <div class="event-content">
+                            <div class="event-main">
+                                <h4 class="event-name">{{ event.name }}</h4>
 
+                                <div class="event-meta">
+                                    <div class="meta-row">
+                                        <i class="bi bi-calendar-event meta-icon"></i>
+                                        <span>{{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}</span>
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <i class="bi bi-tags meta-icon"></i>
+                                        <span>{{ event.genres }}</span>
+                                    </div>
+
+                                    <div class="meta-row">
+                                        <i class="bi bi-ticket-perforated meta-icon"></i>
+                                        <span>Tickets left: {{ event.tickets_available }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="price-pill">
+                                    {% if event.price == 0 %}
+                                        Free
+                                    {% else %}
+                                        AUD {{ "%.2f"|format(event.price) }}
+                                    {% endif %}
+                                </div>
+
+                                <div class="event-actions">
                                     <a href="{{ url_for('event_details_page', event_id=event.id) }}"
-                                       class="card-link event-link fw-bold">
-                                        View
+                                       class="view-link">
+                                        View event
                                     </a>
 
                                     {% if event.status != "Cancelled" %}
                                         <form method="POST"
                                               action="{{ url_for('cancel_event', event_id=event.id) }}"
-                                              style="display:inline;">
-                                            <button type="submit"
-                                                    class="btn btn-link p-0 card-link event-link fw-bold"
-                                                    style="color: red;">
-                                                Cancel
+                                              class="cancel-form">
+                                            <button type="submit" class="cancel-button">
+                                                Cancel event
                                             </button>
                                         </form>
                                     {% endif %}
                                 </div>
+                            </div>
 
-                                <div>
-                                    <p class="m-3">{{ event.status }}</p>
-                                    <p class="card-text fw-bold">{{ event.location }}</p>
+                            <div class="event-side">
+                                <span class="status-pill {% if event.status == 'Cancelled' %}cancelled{% endif %}">
+                                    {{ event.status }}
+                                </span>
+
+                                <div class="location-box">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ event.location }}
+                                </div>
+
+                                <div class="tickets-box">
+                                    {{ event.tickets_available }} tickets available
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        {% else %}
-            <p>You have not created any events yet.</p>
-        {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-calendar-plus"></i>
+                    </div>
+
+                    <h3>No events created yet</h3>
+                    <p>You have not created any events yet.</p>
+
+                    <a href="/event-create" class="empty-create-link">
+                        Create your first event
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
 

@@ -17,12 +17,40 @@ class EventForm(FlaskForm):
     genres = SelectMultipleField(
         "Genres",
         choices=[
-            ("Rock", "Rock"),
             ("Metal", "Metal"),
+            ("Rock", "Rock"),
             ("Alt", "Alt"),
+            ("Rap", "Rap"),
             ("Pop", "Pop"),
             ("Jazz", "Jazz"),
+            ("Country", "Country"),
             ("Electronic", "Electronic"),
+
+            ("Football", "Football"),
+            ("Basketball", "Basketball"),
+            ("Running", "Running"),
+            ("Cycling", "Cycling"),
+            ("Fitness", "Fitness"),
+            ("Motorsport", "Motorsport"),
+
+            ("Comedy", "Comedy"),
+            ("Theatre", "Theatre"),
+            ("Film", "Film"),
+            ("Dance", "Dance"),
+            ("Exhibition", "Exhibition"),
+            ("Workshop", "Workshop"),
+
+            ("Food Festival", "Food Festival"),
+            ("Wine", "Wine"),
+            ("Markets", "Markets"),
+            ("Cooking Class", "Cooking Class"),
+            ("Street Food", "Street Food"),
+
+            ("Family", "Family"),
+            ("Charity", "Charity"),
+            ("Networking", "Networking"),
+            ("Education", "Education"),
+            ("Meetup", "Meetup")
         ],
         validators=[DataRequired()]
     )
