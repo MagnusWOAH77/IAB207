@@ -15,6 +15,21 @@
             {{ form.hidden_tag() }}
 
             <div class="auth-field">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-control", placeholder="Email") }}
+            </div>
+
+            <div class="auth-field">
+                {{ form.first_name.label(class="form-label") }}
+                {{ form.first_name(class="form-control", placeholder="First Name") }}
+            </div>
+
+            <div class="auth-field">
+                {{ form.surname.label(class="form-label") }}
+                {{ form.surname(class="form-control", placeholder="Surname") }}
+            </div>
+
+            <div class="auth-field">
                 {{ form.username.label(class="form-label") }}
                 {{ form.username(class="form-control", placeholder="Username") }}
             </div>
