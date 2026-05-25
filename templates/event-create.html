@@ -1,56 +1,349 @@
 {% extends "base.html" %}
 
+{% block head %}
+<style>
+    .create-page {
+        min-height: 100vh;
+        background: #f8fafc;
+        padding-bottom: 3rem;
+    }
+
+    .create-hero {
+        background:
+            radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.12), transparent 28%),
+            radial-gradient(circle at 85% 75%, rgba(59, 130, 246, 0.24), transparent 32%),
+            linear-gradient(135deg, #07111f 0%, #0f2f63 48%, #123f7a 100%);
+        color: #ffffff;
+        padding: 3rem 1.5rem 5.5rem;
+        margin-bottom: -3.7rem;
+    }
+
+    .create-hero-inner {
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    .create-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #dbeafe;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .create-title {
+        font-size: clamp(2rem, 4vw, 3.3rem);
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        margin-bottom: 0.7rem;
+    }
+
+    .create-subtitle {
+        max-width: 620px;
+        color: #dbeafe;
+        font-size: 1.02rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .create-shell {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .create-card {
+        background: #ffffff;
+        border-radius: 28px;
+        padding: 2rem;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    .form-section-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 1rem;
+        letter-spacing: -0.03em;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem 1.1rem;
+    }
+
+    .form-field {
+        margin-bottom: 1rem;
+    }
+
+    .form-field.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #334155;
+        margin-bottom: 0.45rem;
+    }
+
+    .form-control,
+    .form-select,
+    select {
+        min-height: 48px;
+        border-radius: 14px !important;
+        border: 1.5px solid #dbe3ef !important;
+        background-color: #ffffff;
+        color: #0f172a;
+        font-weight: 600;
+        box-shadow: none !important;
+    }
+
+    textarea.form-control {
+        min-height: 130px;
+        resize: vertical;
+        padding-top: 0.9rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus,
+    select:focus {
+        border-color: #0f2f63 !important;
+        box-shadow: 0 0 0 0.18rem rgba(15, 47, 99, 0.14) !important;
+    }
+
+    .input-group {
+        border-radius: 14px;
+    }
+
+    .input-group-text {
+        border-radius: 14px 0 0 14px;
+        border: 1.5px solid #dbe3ef;
+        border-right: none;
+        background: #eff6ff;
+        color: #0f2f63;
+        font-weight: 800;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 14px 14px 0 !important;
+    }
+
+    .file-upload-box {
+        border: 1.5px dashed #cbd5e1;
+        border-radius: 18px;
+        background: #f8fafc;
+        padding: 1rem;
+    }
+
+    .file-upload-box input {
+        width: 100%;
+    }
+
+    .field-help {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-top: 0.4rem;
+        margin-bottom: 0;
+    }
+
+    .error-text {
+        display: block;
+        color: #dc2626;
+        font-weight: 700;
+        margin-top: 0.45rem;
+        font-size: 0.88rem;
+    }
+
+    .submit-row {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.2rem;
+        padding-top: 1.4rem;
+        border-top: 1px solid #eef2f7;
+    }
+
+    .create-submit {
+        border: none;
+        border-radius: 999px;
+        background: #0f2f63;
+        color: #ffffff;
+        min-height: 52px;
+        padding: 0 1.8rem;
+        font-size: 1rem;
+        font-weight: 800;
+        box-shadow: 0 10px 24px rgba(15, 47, 99, 0.22);
+        transition: 0.2s ease;
+    }
+
+    .create-submit:hover,
+    .create-submit:focus {
+        background: #0b234a;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .select2-container {
+        display: block;
+        width: 100% !important;
+    }
+
+    .select2-selection {
+        min-height: 48px !important;
+        border-radius: 14px !important;
+        border: 1.5px solid #dbe3ef !important;
+        padding: 0.45rem !important;
+    }
+
+    .select2-selection:focus {
+        border-color: #0f2f63 !important;
+    }
+
+    @media (max-width: 768px) {
+        .create-hero {
+            padding: 2.4rem 1rem 5rem;
+        }
+
+        .create-card {
+            padding: 1.4rem;
+            border-radius: 22px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .submit-row {
+            justify-content: stretch;
+        }
+
+        .create-submit {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<div class="p-5">
-    <h2>Create Event</h2>
+<div class="create-page">
 
-    <form method="POST" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-
-        <label class="form-label">Event Thumbnail</label>
-        <div class="form-group">
-            {{ form.image }}
-            {% for error in form.image.errors %}
-                <span style="color: red;">{{ error }}</span>
-            {%  endfor %}
+    <section class="create-hero">
+        <div class="create-hero-inner">
+            <div class="create-kicker">Create event</div>
+            <h1 class="create-title">Add a new event</h1>
+            <p class="create-subtitle">
+                Fill in the event details below so people can discover, view and book your event.
+            </p>
         </div>
+    </section>
 
-        <label class="form-label">Event Name:</label>
-        {{ form.name(class="form-control", placeholder="Event Name") }}
+    <div class="create-shell">
+        <div class="create-card">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
 
-        <label class="form-label">Date:</label>
-        {{ form.event_datetime(class="form-control", id="date-picker", placeholder="Select Date") }}
+                <h3 class="form-section-title">Event details</h3>
 
-        <label class="form-label">Genre:</label>
-        {{ form.genres(class="form-control", id="genre-input", multiple="multiple") }}
+                <div class="form-field full-width">
+                    <label class="form-label">Event Thumbnail</label>
+                    <div class="file-upload-box">
+                        {{ form.image }}
+                        {% for error in form.image.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <p class="field-help">Upload an image that represents the event clearly.</p>
+                </div>
 
-        <label class="form-label">Location:</label>
-        <div class="input-group">
-            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-            {{ form.location(class="form-control") }}
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="form-label">Event Name</label>
+                        {{ form.name(class="form-control", placeholder="Event Name") }}
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Date</label>
+                        {{ form.event_datetime(class="form-control", id="date-picker", placeholder="Select Date") }}
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Genre</label>
+                        <select id="main-genre-input" class="form-control">
+                            <option value="">Select Genre</option>
+                            <option value="music">Music</option>
+                            <option value="sports">Sports</option>
+                            <option value="arts">Arts</option>
+                            <option value="food">Food</option>
+                            <option value="community">Community</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Subgenre</label>
+                        <select id="subgenre-input" class="form-control" disabled>
+                            <option value="">Select a genre first</option>
+                        </select>
+                    </div>
+
+                    <div style="display: none;">
+                        {{ form.genres(class="form-control", id="genre-input", multiple="multiple") }}
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Location</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            {{ form.location(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">AUD</span>
+                            {{ form.price(class="form-control", value="0") }}
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label class="form-label">Tickets Available</label>
+                        {{ form.tickets_available(class="form-control", value="25") }}
+                    </div>
+                </div>
+
+                <div class="form-field">
+                    <label class="form-label">Overview</label>
+                    {{ form.overview(class="form-control", rows="5", placeholder="Describe the event") }}
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label class="form-label">Acknowledgement of Country</label>
+                        {{ form.acknowledgement_type(class="form-control") }}
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label class="form-label">Acknowledgement Text</label>
+                        {{ form.acknowledgement_text(class="form-control", rows="4", placeholder="Optional acknowledgement text") }}
+                    </div>
+                </div>
+
+                <div class="submit-row">
+                    {{ form.submit(class="create-submit", value="Create Event") }}
+                </div>
+            </form>
         </div>
-
-        <label class="form-label">Price:</label>
-        <div class="input-group">
-            <span class="input-group-text">$</span>
-            {{ form.price(class="form-control", value="0") }}
-        </div>
-
-        <label class="form-label">Tickets Available:</label>
-        {{ form.tickets_available(class="form-control", value="25") }}
-
-        <label class="form-label">Overview:</label>
-        {{ form.overview(class="form-control", rows="5") }}
-
-        <label class="form-label">Acknowledgement of Country:</label>
-        {{ form.acknowledgement_type(class="form-control") }}
-
-        <label class="form-label">Acknowledgement Text:</label>
-        {{ form.acknowledgement_text(class="form-control", rows="4", placeholder="Optional acknowledgement text") }}
-
-        {{ form.submit(class="btn btn-success mt-3") }}
-    </form>
+    </div>
 </div>
 
 <script>
@@ -60,9 +353,76 @@ flatpickr("#date-picker", {
     dateFormat: "Y-m-d H:i"
 });
 
-$(document).ready(function() {
-    $('#genre-input').select2();
+const genreOptions = {
+    music: ["Metal", "Rock", "Alt", "Rap", "Pop", "Jazz", "Country", "Electronic"],
+    sports: ["Football", "Basketball", "Running", "Cycling", "Fitness", "Motorsport"],
+    arts: ["Comedy", "Theatre", "Film", "Dance", "Exhibition", "Workshop"],
+    food: ["Food Festival", "Wine", "Markets", "Cooking Class", "Street Food"],
+    community: ["Family", "Charity", "Networking", "Education", "Meetup"]
+};
+
+const mainGenreInput = document.getElementById("main-genre-input");
+const subgenreInput = document.getElementById("subgenre-input");
+const hiddenGenreInput = document.getElementById("genre-input");
+
+const updateHiddenGenreInput = () => {
+    Array.from(hiddenGenreInput.options).forEach(option => {
+        option.selected = false;
+    });
+
+    const selectedSubgenre = subgenreInput.value;
+
+    if (!selectedSubgenre) {
+        return;
+    }
+
+    let matchingOption = Array.from(hiddenGenreInput.options).find(option =>
+        option.value.toLowerCase() === selectedSubgenre.toLowerCase()
+    );
+
+    if (!matchingOption) {
+        matchingOption = document.createElement("option");
+        matchingOption.value = selectedSubgenre;
+        matchingOption.textContent = selectedSubgenre;
+        hiddenGenreInput.appendChild(matchingOption);
+    }
+
+    matchingOption.selected = true;
+};
+
+mainGenreInput.addEventListener("change", () => {
+    const selectedGenre = mainGenreInput.value;
+    const subgenres = genreOptions[selectedGenre] || [];
+
+    subgenreInput.innerHTML = "";
+
+    if (!selectedGenre) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Select a genre first";
+        subgenreInput.appendChild(option);
+        subgenreInput.disabled = true;
+        updateHiddenGenreInput();
+        return;
+    }
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "Select Subgenre";
+    subgenreInput.appendChild(defaultOption);
+
+    subgenres.forEach(subgenre => {
+        const option = document.createElement("option");
+        option.value = subgenre;
+        option.textContent = subgenre;
+        subgenreInput.appendChild(option);
+    });
+
+    subgenreInput.disabled = false;
+    updateHiddenGenreInput();
 });
+
+subgenreInput.addEventListener("change", updateHiddenGenreInput);
 </script>
 
 {% endblock %}

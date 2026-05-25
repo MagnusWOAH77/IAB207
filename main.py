@@ -19,6 +19,7 @@ from forms.comment import CommentForm
 from forms.event import EventForm
 from database.Event import Event
 from database.Comments import Comments
+from database.UserEvents import UserEvents
 
 import os
 
@@ -43,6 +44,7 @@ def load_user(user_id):
     return User.get_user(user_id)
 
 @app.route("/")
+@login_required
 def index():
     selected_genre = request.args.get("genre")
     search = request.args.get("search")
@@ -62,10 +64,25 @@ def index():
 
     db.session.commit()
 
+    events_for_js = []
+
+    for event in events:
+        events_for_js.append({
+            "preview_image": url_for("static", filename="uploads/" + (event.image_filename or "event.jpg")),
+            "name": event.name,
+            "eid": event.id,
+            "date": event.event_datetime.isoformat(),
+            "genreText": event.genres,
+            "price": event.price if event.price is not None else 0,
+            "status": event.status,
+            "location": event.location
+        })
+
     return render_template(
         "index.html",
         title="Home",
         events=events,
+        events_for_js=events_for_js,
         selected_genre=selected_genre,
         search=search
     )
@@ -118,8 +135,6 @@ def create_event_page():
 @app.route("/event-details/<int:event_id>", methods=["GET", "POST"])
 def event_details_page(event_id):
 
-    # TODO - booking form
-    # booking_form = BookingForm()
     comment_form = CommentForm()
 
     if comment_form.validate_on_submit():
@@ -133,9 +148,16 @@ def event_details_page(event_id):
         db.session.add(comment)
         db.session.commit()
 
-
     event = db.get_or_404(Event, event_id)
-    print(event.image_filename)
+
+    existing_booking = None
+
+    if current_user.is_authenticated:
+        existing_booking = db.session.execute(
+            db.select(UserEvents)
+            .where(UserEvents.user_id == int(current_user.get_id()))
+            .where(UserEvents.event_id == event.id)
+        ).scalars().first()
 
     event.update_status()
     db.session.commit()
@@ -153,7 +175,8 @@ def event_details_page(event_id):
         title=event.name,
         event=event,
         comments=comments,
-        comment_form=comment_form
+        comment_form=comment_form,
+        existing_booking=existing_booking
     )
 
 @app.route("/delete_comment<int:comment_id>", methods=["GET"])
@@ -203,7 +226,18 @@ def cancel_event(event_id):
 @app.route("/history")
 @login_required
 def history_page():
-    return render_template("history.html", title="History")
+    booked_events = db.session.execute(
+        db.select(UserEvents, Event)
+        .join(Event, UserEvents.event_id == Event.id)
+        .where(UserEvents.user_id == int(current_user.get_id()))
+        .order_by(UserEvents.booked_at.desc())
+    ).all()
+
+    return render_template(
+        "history.html",
+        title="History",
+        booked_events=booked_events
+    )
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup_page():
@@ -257,6 +291,66 @@ def logout():
     logout_user()
     flash("You have been logged out")
     return redirect(url_for("login_page"))
+
+@app.route("/event/<int:event_id>/book", methods=["POST"])
+@login_required
+def book_event(event_id):
+    event = db.get_or_404(Event, event_id)
+    if event.status == "Cancelled":
+        flash("This event has been cancelled and cannot be booked.", "danger")
+        return redirect(url_for("event_details_page", event_id=event.id))
+
+    existing_booking = db.session.execute(
+        db.select(UserEvents)
+        .where(UserEvents.user_id == int(current_user.get_id()))
+        .where(UserEvents.event_id == event.id)
+    ).scalars().first()
+
+    if existing_booking:
+        flash("You have already booked this event.", "warning")
+        return redirect(url_for("event_details_page", event_id=event.id))
+
+    if event.tickets_available <= 0:
+        flash("This event is sold out.", "danger")
+        return redirect(url_for("event_details_page", event_id=event.id))
+
+    booking = UserEvents(
+        user_id=int(current_user.get_id()),
+        event_id=event.id
+    )
+
+    event.tickets_available -= 1
+    event.update_status()
+
+    db.session.add(booking)
+    db.session.commit()
+
+    flash("Event booked successfully.", "success")
+    return redirect(url_for("history_page"))
+
+@app.route("/event/<int:event_id>/cancel-booking", methods=["POST"])
+@login_required
+def cancel_booking(event_id):
+    event = db.get_or_404(Event, event_id)
+
+    booking = db.session.execute(
+        db.select(UserEvents)
+        .where(UserEvents.user_id == int(current_user.get_id()))
+        .where(UserEvents.event_id == event.id)
+    ).scalars().first()
+
+    if not booking:
+        flash("You do not have a booking for this event.", "warning")
+        return redirect(url_for("event_details_page", event_id=event.id))
+
+    db.session.delete(booking)
+    event.tickets_available += 1
+    event.update_status()
+
+    db.session.commit()
+
+    flash("Booking cancelled.", "success")
+    return redirect(url_for("event_details_page", event_id=event.id))
 
 if __name__ == "__main__":
     app.run(debug=True)

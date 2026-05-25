@@ -1,39 +1,295 @@
-<nav class="navbar navbar-light bg-light">
-  <a class="navbar-brand" href="/">Concerts</a>
+<nav class="navbar custom-navbar">
+    <div class="navbar-inner">
+        <a class="navbar-brand custom-brand" href="/">
+            <span class="brand-mark">E</span>
+            <span>EventFinder</span>
+        </a>
 
-  <div class="d-flex align-items-center">
-        <form class="form-inline mr-2" id="search-form">
-            <input class="form-control form-control-sm" type="search" name="search" placeholder="Search" aria-label="Search">
-        </form>
-        <div class="btn-group">
-            <button type="button" class="btn" data-toggle="dropdown" aria-expanded="false">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-right">
-                <li><a class="dropdown-item" href="/">Home</a></li>
-                <li><a class="dropdown-item" href="/event-create">Create Event</a></li>
-                <li><a class="dropdown-item" href="/my-events">My Events</a></li>
-                <li><a class="dropdown-item" href="/history">History</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sign Out</a></li>
-            </ul>
+        <div class="navbar-actions">
+            <form class="search-form" id="search-form">
+                <div class="search-box">
+                    <i class="bi bi-search search-icon"></i>
+                    <input
+                        class="form-control search-input"
+                        type="search"
+                        name="search"
+                        placeholder="Search events"
+                        aria-label="Search">
+                </div>
+            </form>
+
+            <div class="btn-group">
+                <button
+                    type="button"
+                    class="menu-button"
+                    data-toggle="dropdown"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    aria-label="Open menu">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-right dropdown-menu-end custom-dropdown">
+                    <li>
+                        <a class="dropdown-item custom-dropdown-item" href="/">
+                            <i class="bi bi-house"></i>
+                            Home
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item custom-dropdown-item" href="/event-create">
+                            <i class="bi bi-plus-circle"></i>
+                            Create Event
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item custom-dropdown-item" href="/my-events">
+                            <i class="bi bi-calendar-check"></i>
+                            My Events
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="dropdown-item custom-dropdown-item" href="/history">
+                            <i class="bi bi-clock-history"></i>
+                            History
+                        </a>
+                    </li>
+
+                    <li><hr class="dropdown-divider"></li>
+
+                    <li>
+                        <a class="dropdown-item custom-dropdown-item signout-item" href="{{ url_for('logout') }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                            Sign Out
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-    <script>
 
+    <style>
+        .custom-navbar {
+            background: #ffffff;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+            padding: 0.85rem 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-inner {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .custom-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: #0f2f63;
+            font-weight: 800;
+            font-size: 1.15rem;
+            letter-spacing: -0.03em;
+            text-decoration: none;
+        }
+
+        .custom-brand:hover {
+            color: #0b234a;
+            text-decoration: none;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #0f2f63;
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 8px 18px rgba(15, 47, 99, 0.22);
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .search-form {
+            margin: 0;
+        }
+
+        .search-box {
+            position: relative;
+            width: 260px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 42px;
+            border-radius: 999px;
+            border: 1.5px solid #dbe3ef;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 0.92rem;
+            font-weight: 600;
+            padding-left: 2.55rem;
+            padding-right: 1rem;
+            box-shadow: none;
+        }
+
+        .search-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .search-input:focus {
+            background: #ffffff;
+            border-color: #0f2f63;
+            box-shadow: 0 0 0 0.18rem rgba(15, 47, 99, 0.14);
+        }
+
+        .menu-button {
+            width: 42px;
+            height: 42px;
+            border: none;
+            border-radius: 999px;
+            background: #0f2f63;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            line-height: 1;
+            transition: 0.2s ease;
+            box-shadow: 0 8px 18px rgba(15, 47, 99, 0.22);
+        }
+
+        .menu-button:hover,
+        .menu-button:focus {
+            background: #0b234a;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .custom-dropdown {
+            min-width: 220px;
+            border: none;
+            border-radius: 18px;
+            padding: 0.55rem;
+            margin-top: 0.7rem;
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
+            overflow: hidden;
+        }
+
+        .custom-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            border-radius: 13px;
+            padding: 0.72rem 0.8rem;
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .custom-dropdown-item i {
+            color: #0f2f63;
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+        }
+
+        .custom-dropdown-item:hover,
+        .custom-dropdown-item:focus {
+            background: #eff6ff;
+            color: #0f2f63;
+        }
+
+        .signout-item {
+            color: #dc2626;
+        }
+
+        .signout-item i {
+            color: #dc2626;
+        }
+
+        .signout-item:hover,
+        .signout-item:focus {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 768px) {
+            .custom-navbar {
+                padding: 0.75rem 1rem;
+            }
+
+            .custom-brand span:last-child {
+                display: none;
+            }
+
+            .search-box {
+                width: min(58vw, 240px);
+            }
+        }
+
+        @media (max-width: 420px) {
+            .navbar-inner {
+                gap: 0.65rem;
+            }
+
+            .navbar-actions {
+                gap: 0.5rem;
+            }
+
+            .search-box {
+                width: 180px;
+            }
+
+            .brand-mark,
+            .menu-button {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+
+    <script>
         const searchForm = document.querySelector("#search-form");
 
-        searchForm.addEventListener('submit', async (event) => {
+        searchForm.addEventListener("submit", async (event) => {
             event.preventDefault();
 
             const formData = new FormData(searchForm);
             const search = formData.get("search");
+
             if (search !== "") {
                 const url = new URL(window.location.href);
                 url.searchParams.set("search", formData.get("search"));
                 window.location.href = url.href;
             }
         });
-
     </script>
 </nav>

@@ -1,45 +1,456 @@
 {% extends "base.html" %}
+
 {% block head %}
 <style>
+    .history-page {
+        min-height: 100vh;
+        background: #f8fafc;
+        padding-bottom: 3rem;
+    }
 
-p.event-icon-p {
-    line-height: 0.1;
-}
+    .history-hero {
+        background:
+            radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.12), transparent 28%),
+            radial-gradient(circle at 85% 75%, rgba(59, 130, 246, 0.24), transparent 32%),
+            linear-gradient(135deg, #07111f 0%, #0f2f63 48%, #123f7a 100%);
+        color: #ffffff;
+        padding: 3rem 1.5rem 5.3rem;
+        margin-bottom: -3.5rem;
+    }
 
-.event-link {
-  text-decoration: none;
-}
+    .history-hero-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+    }
 
+    .history-kicker {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        color: #dbeafe;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .history-title {
+        font-size: clamp(2rem, 4vw, 3.3rem);
+        font-weight: 800;
+        letter-spacing: -0.055em;
+        margin-bottom: 0.7rem;
+    }
+
+    .history-subtitle {
+        max-width: 620px;
+        color: #dbeafe;
+        font-size: 1.02rem;
+        line-height: 1.7;
+        margin-bottom: 0;
+    }
+
+    .history-shell {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .history-list {
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    .history-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 26px;
+        overflow: hidden;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .history-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 24px 56px rgba(15, 23, 42, 0.16);
+    }
+
+    .history-card-inner {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 220px;
+    }
+
+    .history-image-wrap {
+        position: relative;
+        overflow: hidden;
+        background: #e2e8f0;
+    }
+
+    .history-img {
+        width: 100%;
+        height: 100%;
+        min-height: 220px;
+        object-fit: cover;
+        transition: transform 0.25s ease;
+    }
+
+    .history-card:hover .history-img {
+        transform: scale(1.04);
+    }
+
+    .history-content {
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .history-main {
+        min-width: 0;
+    }
+
+    .history-event-name {
+        font-size: 1.45rem;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.04em;
+        margin-bottom: 0.9rem;
+        line-height: 1.25;
+    }
+
+    .history-meta {
+        display: grid;
+        gap: 0.55rem;
+        margin-bottom: 1.1rem;
+    }
+
+    .meta-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.55rem;
+        color: #475569;
+        font-size: 0.95rem;
+        line-height: 1.45;
+    }
+
+    .meta-icon {
+        color: #0f2f63;
+        font-size: 1rem;
+        margin-top: 0.1rem;
+        flex-shrink: 0;
+    }
+
+    .price-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #0f2f63;
+        font-weight: 800;
+        padding: 0.45rem 0.85rem;
+        font-size: 0.9rem;
+        width: fit-content;
+    }
+
+    .history-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .view-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #0f2f63;
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        padding: 0.65rem 1.1rem;
+        transition: 0.2s ease;
+        position: relative;
+        z-index: 2;
+    }
+
+    .view-link:hover {
+        background: #0b234a;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    .history-side {
+        min-width: 210px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.75rem;
+        text-align: right;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 0.42rem 0.85rem;
+        background: #e0f2fe;
+        color: #075985;
+        font-size: 0.8rem;
+        font-weight: 800;
+    }
+
+    .status-pill.cancelled {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pill.inactive {
+        background: #f1f5f9;
+        color: #475569;
+    }
+
+    .status-pill.sold-out {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .detail-box {
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 0.9rem;
+        color: #475569;
+        font-weight: 700;
+        line-height: 1.4;
+    }
+
+    .detail-box strong {
+        display: block;
+        color: #0f172a;
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .location-box {
+        color: #0f172a;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .booked-date {
+        color: #64748b;
+        font-weight: 700;
+        margin-bottom: 0;
+        font-size: 0.92rem;
+    }
+
+    .empty-state {
+        background: #ffffff;
+        border-radius: 26px;
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        border: 1px solid rgba(226, 232, 240, 0.9);
+    }
+
+    .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 1rem;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        color: #0f2f63;
+        font-size: 1.7rem;
+    }
+
+    .empty-state h3 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.035em;
+        margin-bottom: 0.45rem;
+    }
+
+    .empty-state p {
+        color: #64748b;
+        margin-bottom: 1.3rem;
+    }
+
+    .browse-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #0f2f63;
+        color: #ffffff;
+        font-weight: 800;
+        text-decoration: none;
+        padding: 0.75rem 1.25rem;
+        transition: 0.2s ease;
+    }
+
+    .browse-link:hover {
+        background: #0b234a;
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 900px) {
+        .history-card-inner {
+            grid-template-columns: 1fr;
+        }
+
+        .history-img {
+            height: 230px;
+            min-height: 230px;
+        }
+
+        .history-content {
+            flex-direction: column;
+        }
+
+        .history-side {
+            align-items: flex-start;
+            text-align: left;
+            min-width: unset;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .history-hero {
+            padding: 2.4rem 1rem 5rem;
+        }
+
+        .history-content {
+            padding: 1.25rem;
+        }
+
+        .history-event-name {
+            font-size: 1.25rem;
+        }
+
+        .history-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .view-link {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
-{% block content %}
-<div class="p-3">
-    <h3>History</h3>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-sm-3">
-                    <img src="./static/uploads/event.jpg" alt="Image Preview" class="img-fluid">
-                </div>
-                <div class="col-sm-9">
-                    <div class="d-flex">
-                        <div>
-                            <h4 class="card-title">Event Title</h4>
-                            <p class="card-text fw-bold event-icon-p">21 May 2026 at 6:00pm</p>
-                            <p class="card-text event-icon-p">Metal, Rock</p>
-                            <p class="card-text event-icon-p">$50</p>
-                            <a href="#" class="card-link event-link fw-bold" style="color: red">Unbook</a>
-                        </div>
-                        <div>
-                            <p class="m-3 fw-bold">OPEN</p>
-                            <p class="fw-bold">Booking ID: 1</p>
-                            <p class="card-text fw-bold">Bisbane Entertainment Centre</p>
+{% block content %}
+
+<div class="history-page">
+
+    <section class="history-hero">
+        <div class="history-hero-inner">
+            <div class="history-kicker">Booking history</div>
+            <h1 class="history-title">Your booked events</h1>
+            <p class="history-subtitle">
+                Keep track of the events you have booked and view the details whenever you need them.
+            </p>
+        </div>
+    </section>
+
+    <div class="history-shell">
+        <div class="history-list">
+            {% if booked_events %}
+                {% for user_event, event in booked_events %}
+                    <div class="history-card">
+                        <div class="history-card-inner">
+                            <div class="history-image-wrap">
+                                <img src="{{ url_for('static', filename='uploads/' ~ (event.image_filename or 'event.jpg')) }}"
+                                     alt="Image Preview"
+                                     class="history-img">
+                            </div>
+
+                            <div class="history-content">
+                                <div class="history-main">
+                                    <h4 class="history-event-name">{{ event.name }}</h4>
+
+                                    <div class="history-meta">
+                                        <div class="meta-row">
+                                            <i class="bi bi-calendar-event meta-icon"></i>
+                                            <span>{{ event.event_datetime.strftime('%d %B %Y at %I:%M %p') }}</span>
+                                        </div>
+
+                                        <div class="meta-row">
+                                            <i class="bi bi-tags meta-icon"></i>
+                                            <span>{{ event.genres }}</span>
+                                        </div>
+
+                                        <div class="meta-row">
+                                            <i class="bi bi-geo-alt meta-icon"></i>
+                                            <span>{{ event.location }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="price-pill">
+                                        {% if event.price == 0 %}
+                                            Free
+                                        {% else %}
+                                            AUD {{ "%.2f"|format(event.price) }}
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="history-actions">
+                                        <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                                           class="view-link">
+                                            View event
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="history-side">
+                                    <span class="status-pill
+                                        {% if event.status == 'Cancelled' %}cancelled{% endif %}
+                                        {% if event.status == 'Inactive' %}inactive{% endif %}
+                                        {% if event.status == 'Sold Out' %}sold-out{% endif %}">
+                                        {{ event.status }}
+                                    </span>
+
+                                    <div class="detail-box">
+                                        <strong>Booking ID</strong>
+                                        {{ user_event.id }}
+                                    </div>
+
+                                    <p class="booked-date">
+                                        Booked on {{ user_event.booked_at.strftime('%d %B %Y') }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-ticket-perforated"></i>
+                    </div>
+
+                    <h3>No bookings yet</h3>
+                    <p>You have not booked any events yet.</p>
+
+                    <a href="/" class="browse-link">
+                        Browse events
+                    </a>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>
+
 {% endblock %}
