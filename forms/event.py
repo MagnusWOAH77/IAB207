@@ -10,7 +10,6 @@ class EventForm(FlaskForm):
     location = StringField("Location", validators=[DataRequired()])
 
     image = FileField("Upload Image", validators=[
-        FileRequired(),
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only (.jpg, .png)!')
     ])
 

@@ -95,7 +95,7 @@ def create_event_page():
     if form.validate_on_submit():
         event_datetime = datetime.strptime(form.event_datetime.data, "%Y-%m-%d %H:%M")
 
-        print("Processing Form")
+        # image_file = form.image if form.image != None else "event.jpg"
 
         event = Event(
             name=form.name.data,
@@ -116,14 +116,15 @@ def create_event_page():
         db.session.add(event)
         db.session.commit()
 
-        thumbnail = form.image.data
-        _, extension = os.path.splitext(secure_filename(thumbnail.filename))
-        thumbnail_name = str(event.id) + extension
-        thumbnail_filepath = os.path.join(app.config['UPLOAD_FOLDER'], thumbnail_name)
-        thumbnail.save(thumbnail_filepath)
+        if form.image.data is not None:
+            thumbnail = form.image.data
+            _, extension = os.path.splitext(secure_filename(thumbnail.filename))
+            thumbnail_name = str(event.id) + extension
+            thumbnail_filepath = os.path.join(app.config['UPLOAD_FOLDER'], thumbnail_name)
+            thumbnail.save(thumbnail_filepath)
 
-        event.image_filename = thumbnail_name
-        db.session.commit()
+            event.image_filename = thumbnail_name
+            db.session.commit()
 
         flash("Event created successfully.", "success")
         return redirect(url_for("event_details_page", event_id=event.id))
@@ -255,7 +256,13 @@ def signup_page():
         password_hash = bcrypt.hashpw(form.password.data.encode("utf-8"), bcrypt.gensalt())
 
         # create user
-        user = DBUser(username=form.username.data, password=password_hash.decode("utf-8"))
+        user = DBUser(
+            username=form.username.data, 
+            password=password_hash.decode("utf-8"),
+            email=form.email.data,
+            first_name=form.first_name.data,
+            surname=form.surname.data
+            )
         db.session.add(user)
         db.session.commit()
 
