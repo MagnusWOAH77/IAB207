@@ -44,7 +44,6 @@ def load_user(user_id):
     return User.get_user(user_id)
 
 @app.route("/")
-@login_required
 def index():
     selected_genre = request.args.get("genre")
     search = request.args.get("search")
@@ -255,22 +254,30 @@ def signup_page():
         # hash password
         password_hash = bcrypt.hashpw(form.password.data.encode("utf-8"), bcrypt.gensalt())
 
-        # create user
-        user = DBUser(
-            username=form.username.data, 
-            password=password_hash.decode("utf-8"),
-            email=form.email.data,
-            first_name=form.first_name.data,
-            surname=form.surname.data
-            )
-        db.session.add(user)
-        db.session.commit()
+        if len(str(form.phone_number.data)) != 10:
+            return render_template("signup.html", title="Sign Up", form=form, alerts=["Phone number must be 10 Characters"])
+
+        try:
+            # create user
+            user = DBUser(
+                username=form.username.data, 
+                password=password_hash.decode("utf-8"),
+                email=form.email.data,
+                first_name=form.first_name.data,
+                surname=form.surname.data,
+                phone_number=form.phone_number.data,
+                address=form.address.data
+                )
+            db.session.add(user)
+            db.session.commit()
+        except:
+            return render_template("signup.html", title="Sign Up", form=form, alerts=["Username or Email already exists"])
 
         #login
         login_user(User(user.id, user.username, user.password))
         return redirect(url_for("index"))
     
-    return render_template("signup.html", title="Sign Up", form=form)
+    return render_template("signup.html", title="Sign Up", form=form, alerts=[])
 
 @app.route("/login", methods=["GET", "POST"])
 def login_page():
