@@ -69,6 +69,8 @@ class EventForm(FlaskForm):
         validators=[DataRequired()]
     )
 
-    acknowledgement_text = TextAreaField("Acknowledgement Text")
+    acknowledgement_city = StringField("Event City / Place")
+    traditional_custodians = StringField("Traditional Custodians / Traditional Owners")
+    acknowledgement_text = TextAreaField("Enhanced Acknowledgement Text")
 
     submit = SubmitField("Create Event")
