@@ -9,3 +9,5 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(unique=True)
     first_name: Mapped[str]
     surname: Mapped[str]
+    phone_number: Mapped[int]
+    address: Mapped[str]
