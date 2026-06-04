@@ -278,6 +278,14 @@
 
 {% block content %}
 
+{% for alert in alerts %}
+<div class="position-fixed top-0 start-0 w-100 p-3" style="z-index: 1100;">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ alert }}
+  </div>
+</div>
+{% endfor %}
+
 <div class="create-page">
 
     <section class="create-hero">

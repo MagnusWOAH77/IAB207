@@ -6,7 +6,7 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 
 class EventForm(FlaskForm):
     name = StringField("Event Name", validators=[DataRequired()])
-    event_datetime = StringField("Date and Time", validators=[DataRequired()])
+    event_datetime = StringField("Date and Time")
     location = StringField("Location", validators=[DataRequired()])
 
     image = FileField("Upload Image", validators=[
@@ -54,7 +54,7 @@ class EventForm(FlaskForm):
         validators=[DataRequired()]
     )
 
-    price = DecimalField("Price", validators=[DataRequired(), NumberRange(min=0)])
+    price = DecimalField("Price", validators=[NumberRange(min=0)])
     tickets_available = IntegerField("Tickets Available", validators=[DataRequired(), NumberRange(min=0)])
 
     overview = TextAreaField("Overview", validators=[DataRequired()])

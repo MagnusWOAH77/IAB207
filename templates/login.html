@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+    
+{% for alert in alerts %}
+<div class="position-fixed top-0 start-0 w-100 p-3" style="z-index: 1100;">
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ alert }}
+  </div>
+</div>
+{% endfor %}
 
 <div class="auth-page">
     <div class="auth-box">
@@ -17,11 +25,17 @@
             <div class="auth-field">
                 {{ form.username.label(class="form-label") }}
                 {{ form.username(class="form-control", placeholder="Username") }}
+                {% for error in form.username.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.password.label(class="form-label") }}
                 {{ form.password(class="form-control", type="password", placeholder="Password") }}
+                {% for error in form.password.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="forgot-row">

@@ -116,9 +116,10 @@ def create_event_page():
     form = EventForm()
 
     if form.validate_on_submit():
+        if (not form.event_datetime.data):
+            return render_template("event-create.html", title="Create Event", form=form, alerts=["Event date and time is required."])
+        
         event_datetime = datetime.strptime(form.event_datetime.data, "%Y-%m-%d %H:%M")
-
-        # image_file = form.image if form.image != None else "event.jpg"
 
         acknowledgement_city, traditional_custodians, acknowledgement_text = build_acknowledgement_values(form)
 
@@ -158,7 +159,7 @@ def create_event_page():
     else:
         print(form.errors)
 
-    return render_template("event-create.html", title="Create Event", form=form)
+    return render_template("event-create.html", title="Create Event", form=form, alerts=[])
 
 @app.route("/event-details/<int:event_id>", methods=["GET", "POST"])
 def event_details_page(event_id):
@@ -330,13 +331,12 @@ def login_page():
 
         # check if password is correct
         if not user or not bcrypt.checkpw(form.password.data.encode("utf-8"), user.password.encode("utf-8")):
-            print("Invalid username or password!")
-            return render_template("login.html", title="Login", form=form)
+            return render_template("login.html", title="Login", form=form, alerts=["Invalid username or password"])
 
         # Login
         login_user(User(user.id, user.username, user.password))
         return redirect(url_for("index"))
-    return render_template("login.html", title="Login", form=form)
+    return render_template("login.html", title="Login", form=form, alerts=[])
 
 @app.route("/logout")
 @login_required
