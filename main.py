@@ -57,7 +57,8 @@ login_manager.init_app(app)
 login_manager.login_view = "login_page"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.db"
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app.config['UPLOAD_FOLDER'] = os.path.join(BASE_DIR, 'static', 'uploads')
 db.init_app(app)
 
 with app.app_context():
