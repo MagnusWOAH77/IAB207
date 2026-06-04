@@ -1,0 +1,11 @@
+[project]
+name = "IAB207_app"
+version = "1.0.0"
+description = "Flask Application created for IAB207 Assessment 2"
+dependencies = [
+    "flask",
+]
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"

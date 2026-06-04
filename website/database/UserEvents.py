@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime
-from database.base import db
+from website.database.base import db
 
 
 class UserEvents(db.Model):
