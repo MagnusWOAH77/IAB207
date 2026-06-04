@@ -63,7 +63,7 @@
                     <li><hr class="dropdown-divider"></li>
 
                     <li>
-                        <a class="dropdown-item custom-dropdown-item signout-item" href="{{ url_for('logout') }}">
+                        <a class="dropdown-item custom-dropdown-item signout-item" href="{{ url_for('main.logout') }}">
                             <i class="bi bi-box-arrow-right"></i>
                             Sign Out
                         </a>
@@ -72,7 +72,7 @@
                     {% else %}
                     <li><hr class="dropdown-divider"></li>
                     <li>
-                        <a class="dropdown-item custom-dropdown-item signout-item" href="{{ url_for('login_page') }}">
+                        <a class="dropdown-item custom-dropdown-item signout-item" href="{{ url_for('main.login_page') }}">
                             <i class="bi bi-box-arrow-in-left"></i>
                             Login
                         </a>

@@ -353,13 +353,13 @@
 </head>
 <body>
 
-{% if request.endpoint not in ['login_page', 'signup_page'] %}
+{% if request.endpoint not in ['main.login_page', 'main.signup_page'] %}
     {% include "navbar.html" %}
 {% endif %}
 
 {% block content %}{% endblock %}
 
-{% if request.endpoint not in ['login_page', 'signup_page'] %}
+{% if request.endpoint not in ['main.login_page', 'main.signup_page'] %}
 <footer class="site-footer">
     <div class="footer-container">
         <div class="footer-main">
@@ -378,10 +378,10 @@
                 <p class="footer-heading">Quick Links</p>
 
                 <div class="footer-links">
-                    <a href="{{ url_for('index') }}">Home</a>
-                    <a href="{{ url_for('create_event_page') }}">Create Event</a>
-                    <a href="{{ url_for('my_events_page') }}">My Events</a>
-                    <a href="{{ url_for('history_page') }}">History</a>
+                    <a href="{{ url_for('main.index') }}">Home</a>
+                    <a href="{{ url_for('main.create_event_page') }}">Create Event</a>
+                    <a href="{{ url_for('main.my_events_page') }}">My Events</a>
+                    <a href="{{ url_for('main.history_page') }}">History</a>
                 </div>
             </div>
         </div>

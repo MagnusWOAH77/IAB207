@@ -1,4 +1,4 @@
-from database.User import User as DBUser
+from website.database.User import User as DBUser
 '''
 
 User class handles user authentication and sessions using Flask-Login

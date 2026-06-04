@@ -1,7 +1,7 @@
 from datetime import datetime, timezone 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, Text, DateTime, Float, Integer, String
-from database.base import db
+from website.database.base import db
 
 
 class Event(db.Model):

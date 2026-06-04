@@ -404,7 +404,7 @@
                     </div>
 
                     <div class="event-card-body">
-                        <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                        <a href="{{ url_for('main.event_details_page', event_id=event.id) }}"
                            class="event-link stretched-link">
                             <h4 class="event-title">{{ event.name }}</h4>
                         </a>
@@ -535,7 +535,7 @@ const getEventCard = event => {
     });
 
     const priceText = Number(event.price) === 0 ? "Free" : `AUD ${Number(event.price).toFixed(2)}`;
-    const eventDetailsBaseUrl = "{{ url_for('event_details_page', event_id=0) }}";
+    const eventDetailsBaseUrl = "{{ url_for('main.event_details_page', event_id=0) }}";
     const eventDetailsUrl = eventDetailsBaseUrl.replace("0", event.eid);
     const statusClass = getStatusClass(event.status);
 

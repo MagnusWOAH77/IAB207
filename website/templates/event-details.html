@@ -549,14 +549,14 @@
                                     Booked
                                 </button>
 
-                                <form method="POST" action="{{ url_for('cancel_booking', event_id=event.id) }}">
+                                <form method="POST" action="{{ url_for('main.cancel_booking', event_id=event.id) }}">
                                     <button type="submit" class="danger-action">
                                         Cancel Booking
                                     </button>
                                 </form>
                             </div>
                         {% else %}
-                            <form method="POST" action="{{ url_for('book_event', event_id=event.id) }}">
+                            <form method="POST" action="{{ url_for('main.book_event', event_id=event.id) }}">
                                 <button type="submit" class="primary-action">
                                     Book Event
                                 </button>
@@ -564,7 +564,7 @@
                         {% endif %}
 
                     {% else %}
-                        <a href="{{ url_for('login_page') }}" class="primary-action">
+                        <a href="{{ url_for('main.login_page') }}" class="primary-action">
                             Log in to Book
                         </a>
                     {% endif %}
@@ -620,7 +620,7 @@
                 </form>
             {% else %}
                 <div class="login-comment-box">
-                    <a href="{{ url_for('login_page') }}">Log in</a> to leave a comment.
+                    <a href="{{ url_for('main.login_page') }}">Log in</a> to leave a comment.
                 </div>
             {% endif %}
 
@@ -634,7 +634,7 @@
                             </div>
 
                             {% if current_user.is_authenticated and current_user.user_id == user.id %}
-                                <a href="{{ url_for('delete_comment', comment_id=comment.id) }}" class="delete-link">
+                                <a href="{{ url_for('main.delete_comment', comment_id=comment.id) }}" class="delete-link">
                                     Delete
                                 </a>
                             {% endif %}

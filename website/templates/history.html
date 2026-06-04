@@ -407,7 +407,7 @@
                                     </div>
 
                                     <div class="history-actions">
-                                        <a href="{{ url_for('event_details_page', event_id=event.id) }}"
+                                        <a href="{{ url_for('main.event_details_page', event_id=event.id) }}"
                                            class="view-link">
                                             View event
                                         </a>
@@ -444,7 +444,7 @@
                     <h3>No bookings yet</h3>
                     <p>You have not booked any events yet.</p>
 
-                    <a href="/" class="browse-link">
+                    <a href="{{ url_for('main.index') }}" class="browse-link">
                         Browse events
                     </a>
                 </div>
