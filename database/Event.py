@@ -28,6 +28,8 @@ class Event(db.Model):
 
     # Acknowledgement of Country. Not an enum :P.
     acknowledgement_type: Mapped[str] = mapped_column(String(50), nullable=False, default="None")
+    acknowledgement_city: Mapped[str] = mapped_column(String(120), nullable=True)
+    traditional_custodians: Mapped[str] = mapped_column(String(200), nullable=True)
     acknowledgement_text: Mapped[str] = mapped_column(Text, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now())

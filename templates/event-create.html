@@ -207,6 +207,49 @@
         border-color: #0f2f63 !important;
     }
 
+
+    .ack-guidance-box {
+        border-radius: 20px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 1.2rem;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .ack-guidance-box h4,
+    .ack-guidance-box h5 {
+        color: #0f172a;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+
+    .ack-guidance-box a {
+        color: #0f2f63;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .ack-guidance-box a:hover {
+        text-decoration: underline;
+    }
+
+    .ack-preview-box {
+        border-radius: 18px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        padding: 1rem;
+        color: #334155;
+        line-height: 1.7;
+        font-weight: 600;
+    }
+
+    .ack-hidden {
+        display: none;
+    }
+
     @media (max-width: 768px) {
         .create-hero {
             padding: 2.4rem 1rem 5rem;
@@ -329,13 +372,83 @@
                 <div class="form-grid">
                     <div class="form-field">
                         <label class="form-label">Acknowledgement of Country</label>
-                        {{ form.acknowledgement_type(class="form-control") }}
+                        {{ form.acknowledgement_type(class="form-control", id="acknowledgement-type") }}
+                    </div>
+                </div>
+
+                <div id="ack-details" class="ack-hidden">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label class="form-label">Event City / Place</label>
+                            {{ form.acknowledgement_city(class="form-control", id="acknowledgement-city", placeholder="e.g. Brisbane / Meanjin") }}
+                            <p class="field-help">Use the event location or nearest city/place name. Please verify Traditional Custodians using reliable sources.</p>
+                        </div>
+
+                        <div class="form-field">
+                            <label class="form-label">Traditional Custodians / Traditional Owners</label>
+                            {{ form.traditional_custodians(class="form-control", id="traditional-custodians", placeholder="e.g. Turrbal and Jagera/Yuggera peoples") }}
+                            <p class="field-help">Suggested capital-city information may be a starting point only. Always check local sources where possible.</p>
+                        </div>
                     </div>
 
-                    <div class="form-field full-width">
-                        <label class="form-label">Acknowledgement Text</label>
-                        {{ form.acknowledgement_text(class="form-control", rows="4", placeholder="Optional acknowledgement text") }}
+                    <div id="generic-ack-section" class="ack-hidden">
+                        <div class="ack-preview-box">
+                            <strong>Generic acknowledgement saved for this event:</strong>
+                            <p id="generic-ack-preview" class="mb-0">
+                                We acknowledge the Traditional Custodians of the land on which this event takes place.
+                                We pay our respects to Elders past and present, and recognise the continuing connection
+                                of Aboriginal and Torres Strait Islander peoples to land, waters, culture and community.
+                            </p>
+                        </div>
                     </div>
+
+                    <div id="enhanced-ack-section" class="ack-hidden">
+                        <div class="ack-guidance-box">
+                            <h4>Enhanced Acknowledgement guidance</h4>
+                            <p>
+                                A meaningful Acknowledgement of Country should be specific to the event location,
+                                recognise the relevant Traditional Custodians or Traditional Owners, and avoid
+                                treating the acknowledgement as a generic formality.
+                            </p>
+                            <p>
+                                Use reliable sources to check the Traditional Custodians of the event location.
+                                A useful starting point is the
+                                <a href="https://aiatsis.gov.au/explore/map-indigenous-australia" target="_blank" rel="noopener">
+                                    AIATSIS Map of Indigenous Australia
+                                </a>.
+                                You may also use AIATSIS Whose Country, Reconciliation Australia, Know Your Country,
+                                and local council or local Aboriginal and Torres Strait Islander organisation resources.
+                            </p>
+                            <h5>Common mistakes to avoid</h5>
+                            <ul>
+                                <li>Do not guess Traditional Custodian names.</li>
+                                <li>Do not use a Welcome to Country unless it is delivered by an authorised Traditional Owner.</li>
+                                <li>Do not copy text without checking whether it fits the event location.</li>
+                                <li>Do not overstate certainty where Traditional Owner information may be complex or contested.</li>
+                                <li>Try to connect the acknowledgement to the event, place, and community context.</li>
+                            </ul>
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label class="form-label">Custom Enhanced Acknowledgement Text</label>
+                            {{ form.acknowledgement_text(class="form-control", id="acknowledgement-text", rows="5", placeholder="Write a researched, place-specific acknowledgement for this event") }}
+                            <p class="field-help">Only enhanced acknowledgements use custom text. Generic acknowledgements are automatically saved using the fixed generic statement.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ack-guidance-box">
+                    <h4>General guide: Acknowledgement of Country</h4>
+                    <p>
+                        An Acknowledgement of Country recognises the Traditional Custodians of the land where an event is held
+                        and pays respect to Elders past and present. It supports reconciliation by recognising the continuing
+                        connection of Aboriginal and Torres Strait Islander peoples to land, waters, culture and community.
+                    </p>
+                    <p>
+                        A Welcome to Country is different. It is delivered by Traditional Owners, or Aboriginal and Torres Strait
+                        Islander people with authority to welcome visitors to Country. Event creators should not present their own
+                        acknowledgement as a Welcome to Country.
+                    </p>
                 </div>
 
                 <div class="submit-row">
@@ -423,6 +536,78 @@ mainGenreInput.addEventListener("change", () => {
 });
 
 subgenreInput.addEventListener("change", updateHiddenGenreInput);
+
+
+const acknowledgementTypeInput = document.getElementById("acknowledgement-type");
+const ackDetails = document.getElementById("ack-details");
+const genericAckSection = document.getElementById("generic-ack-section");
+const enhancedAckSection = document.getElementById("enhanced-ack-section");
+const acknowledgementCityInput = document.getElementById("acknowledgement-city");
+const traditionalCustodiansInput = document.getElementById("traditional-custodians");
+const acknowledgementTextInput = document.getElementById("acknowledgement-text");
+
+const capitalCityCustodians = {
+    "brisbane": "Turrbal and Jagera/Yuggera peoples",
+    "meanjin": "Turrbal and Jagera/Yuggera peoples",
+    "sydney": "Gadigal people of the Eora Nation",
+    "melbourne": "Wurundjeri Woi-wurrung and Bunurong/Boon Wurrung peoples",
+    "canberra": "Ngunnawal people",
+    "adelaide": "Kaurna people",
+    "perth": "Whadjuk Noongar people",
+    "hobart": "palawa/Tasmanian Aboriginal people",
+    "darwin": "Larrakia people"
+};
+
+const updateAcknowledgementDisplay = () => {
+    const selectedType = acknowledgementTypeInput.value;
+
+    ackDetails.classList.add("ack-hidden");
+    genericAckSection.classList.add("ack-hidden");
+    enhancedAckSection.classList.add("ack-hidden");
+
+    if (selectedType === "None") {
+        if (acknowledgementCityInput) acknowledgementCityInput.value = "";
+        if (traditionalCustodiansInput) traditionalCustodiansInput.value = "";
+        if (acknowledgementTextInput) acknowledgementTextInput.value = "";
+        return;
+    }
+
+    ackDetails.classList.remove("ack-hidden");
+
+    if (selectedType === "Generic") {
+        genericAckSection.classList.remove("ack-hidden");
+        if (acknowledgementTextInput) acknowledgementTextInput.value = "";
+        return;
+    }
+
+    if (selectedType === "Enhanced") {
+        enhancedAckSection.classList.remove("ack-hidden");
+    }
+};
+
+const suggestTraditionalCustodians = () => {
+    if (!acknowledgementCityInput || !traditionalCustodiansInput) {
+        return;
+    }
+
+    if (traditionalCustodiansInput.value.trim() !== "") {
+        return;
+    }
+
+    const city = acknowledgementCityInput.value.trim().toLowerCase();
+    if (capitalCityCustodians[city]) {
+        traditionalCustodiansInput.value = capitalCityCustodians[city];
+    }
+};
+
+if (acknowledgementTypeInput) {
+    acknowledgementTypeInput.addEventListener("change", updateAcknowledgementDisplay);
+    updateAcknowledgementDisplay();
+}
+
+if (acknowledgementCityInput) {
+    acknowledgementCityInput.addEventListener("blur", suggestTraditionalCustodians);
+}
 </script>
 
 {% endblock %}

@@ -25,6 +25,30 @@ import os
 
 import bcrypt
 
+GENERIC_ACKNOWLEDGEMENT_TEXT = (
+    "We acknowledge the Traditional Custodians of the land on which this event takes place. "
+    "We pay our respects to Elders past and present, and recognise the continuing connection "
+    "of Aboriginal and Torres Strait Islander peoples to land, waters, culture and community."
+)
+
+
+def build_acknowledgement_values(form):
+    acknowledgement_type = form.acknowledgement_type.data
+
+    if acknowledgement_type == "None":
+        return None, None, None
+
+    acknowledgement_city = form.acknowledgement_city.data.strip() if form.acknowledgement_city.data else None
+    traditional_custodians = form.traditional_custodians.data.strip() if form.traditional_custodians.data else None
+
+    if acknowledgement_type == "Generic":
+        acknowledgement_text = GENERIC_ACKNOWLEDGEMENT_TEXT
+    else:
+        acknowledgement_text = form.acknowledgement_text.data.strip() if form.acknowledgement_text.data else ""
+
+    return acknowledgement_city, traditional_custodians, acknowledgement_text
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "123"
 bootstrap = Bootstrap(app)
@@ -96,6 +120,8 @@ def create_event_page():
 
         # image_file = form.image if form.image != None else "event.jpg"
 
+        acknowledgement_city, traditional_custodians, acknowledgement_text = build_acknowledgement_values(form)
+
         event = Event(
             name=form.name.data,
             event_datetime=event_datetime,
@@ -105,7 +131,9 @@ def create_event_page():
             tickets_available=form.tickets_available.data,
             overview=form.overview.data,
             acknowledgement_type=form.acknowledgement_type.data,
-            acknowledgement_text=form.acknowledgement_text.data,
+            acknowledgement_city=acknowledgement_city,
+            traditional_custodians=traditional_custodians,
+            acknowledgement_text=acknowledgement_text,
             owner_id=int(current_user.get_id()),
             image_filename="event.jpg"
         )

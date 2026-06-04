@@ -580,7 +580,29 @@
                 <div class="ack-card">
                     <h2 class="section-title">Acknowledgement of Country</h2>
                     <span class="ack-type">{{ event.acknowledgement_type }}</span>
+
+                    {% if event.acknowledgement_city %}
+                        <p class="section-text">
+                            <strong>Event place:</strong> {{ event.acknowledgement_city }}
+                        </p>
+                    {% endif %}
+
+                    {% if event.traditional_custodians %}
+                        <p class="section-text">
+                            <strong>Traditional Custodians / Traditional Owners:</strong>
+                            {{ event.traditional_custodians }}
+                        </p>
+                    {% endif %}
+
                     <p class="section-text">{{ event.acknowledgement_text }}</p>
+
+                    {% if event.acknowledgement_type == "Enhanced" %}
+                        <p class="section-text" style="margin-top: 1rem;">
+                            This acknowledgement was created using an enhanced, place-specific approach. Event creators are encouraged
+                            to verify Traditional Custodian information using reliable sources such as AIATSIS, Reconciliation Australia,
+                            Know Your Country, and relevant local council or community resources.
+                        </p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
