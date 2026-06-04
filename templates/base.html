@@ -169,6 +169,162 @@
             text-decoration: underline;
         }
 
+        .site-footer {
+            margin-top: 4rem;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.08), transparent 28%),
+                radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.18), transparent 32%),
+                linear-gradient(135deg, #07111f 0%, #0f2f63 48%, #123f7a 100%);
+            color: #ffffff;
+            padding: 3rem 1.25rem 1.4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-footer::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                repeating-radial-gradient(
+                    circle at bottom left,
+                    transparent 0 95px,
+                    rgba(255,255,255,0.04) 96px 98px
+                );
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .footer-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .footer-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+        }
+
+        .footer-brand {
+            max-width: 430px;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-logo-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: #ffffff;
+            color: #0f2f63;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+        }
+
+        .footer-logo-text {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+
+        .footer-description {
+            margin: 0;
+            color: #cbd5e1;
+            font-size: 0.96rem;
+            line-height: 1.65;
+        }
+
+        .footer-links-wrap {
+            text-align: right;
+        }
+
+        .footer-heading {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #bfdbfe;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.9rem;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.8rem 1.2rem;
+        }
+
+        .footer-links a {
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            position: relative;
+            z-index: 1;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+        }
+
+        .footer-tagline {
+            color: #dbeafe;
+        }
+
+        @media (max-width: 768px) {
+            .footer-main {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .footer-links-wrap {
+                text-align: center;
+            }
+
+            .footer-links {
+                justify-content: center;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
         @media (max-width: 576px) {
             .auth-page {
                 padding: 1rem;
@@ -182,6 +338,16 @@
             .auth-title {
                 font-size: 1.9rem;
             }
+
+            .site-footer {
+                margin-top: 3rem;
+                padding: 2.5rem 1rem 1.3rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 0.55rem;
+            }
         }
     </style>
 </head>
@@ -192,6 +358,41 @@
 {% endif %}
 
 {% block content %}{% endblock %}
+
+{% if request.endpoint not in ['login_page', 'signup_page'] %}
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-main">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <span class="footer-logo-mark">E</span>
+                    <span class="footer-logo-text">EventFinder</span>
+                </div>
+
+                <p class="footer-description">
+                    Discover, create, manage and book events around Brisbane in one simple platform.
+                </p>
+            </div>
+
+            <div class="footer-links-wrap">
+                <p class="footer-heading">Quick Links</p>
+
+                <div class="footer-links">
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('create_event_page') }}">Create Event</a>
+                    <a href="{{ url_for('my_events_page') }}">My Events</a>
+                    <a href="{{ url_for('history_page') }}">History</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 EventFinder. Created for IAB207.</p>
+        <p class="footer-tagline">Built for event discovery and booking.</p>
+    </div>
+</footer>
+{% endif %}
 
 </body>
 </html>

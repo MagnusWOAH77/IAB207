@@ -2,16 +2,14 @@
 
 {% block content %}
 
-
 {% for alert in alerts %}
-
 <div class="position-fixed top-0 start-0 w-100 p-3" style="z-index: 1100;">
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{alert}}
+    {{ alert }}
   </div>
 </div>
-
 {% endfor %}
+
 <div class="auth-page">
     <div class="auth-box">
 
@@ -27,41 +25,65 @@
             <div class="auth-field">
                 {{ form.email.label(class="form-label") }}
                 {{ form.email(class="form-control", placeholder="Email") }}
+                {% for error in form.email.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.phone_number.label(class="form-label") }}
                 {{ form.phone_number(class="form-control", placeholder="Phone Number") }}
+                {% for error in form.phone_number.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.address.label(class="form-label") }}
                 {{ form.address(class="form-control", placeholder="Address") }}
+                {% for error in form.address.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.first_name.label(class="form-label") }}
                 {{ form.first_name(class="form-control", placeholder="First Name") }}
+                {% for error in form.first_name.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.surname.label(class="form-label") }}
                 {{ form.surname(class="form-control", placeholder="Surname") }}
+                {% for error in form.surname.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.username.label(class="form-label") }}
                 {{ form.username(class="form-control", placeholder="Username") }}
+                {% for error in form.username.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.password.label(class="form-label") }}
                 {{ form.password(class="form-control", type="password", placeholder="Password") }}
+                {% for error in form.password.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             <div class="auth-field">
                 {{ form.confirm_password.label(class="form-label") }}
                 {{ form.confirm_password(class="form-control", type="password", placeholder="Confirm password") }}
+                {% for error in form.confirm_password.errors %}
+                    <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
             </div>
 
             {{ form.submit(class="auth-btn", value="Create Account") }}

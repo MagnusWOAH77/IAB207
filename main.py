@@ -243,40 +243,51 @@ def history_page():
 def signup_page():
     form = SignupForm()
 
-    # Form handling
     if form.validate_on_submit():
-    
-        # passwords confirmation match
+
         if form.password.data != form.confirm_password.data:
-            print("Passwords do not match!")
-            return render_template("signup.html", title="Sign Up", form=form)
-        
-        # hash password
-        password_hash = bcrypt.hashpw(form.password.data.encode("utf-8"), bcrypt.gensalt())
+            return render_template(
+                "signup.html",
+                title="Sign Up",
+                form=form,
+                alerts=["Passwords do not match"]
+            )
 
         if len(str(form.phone_number.data)) != 10:
-            return render_template("signup.html", title="Sign Up", form=form, alerts=["Phone number must be 10 Characters"])
+            return render_template(
+                "signup.html",
+                title="Sign Up",
+                form=form,
+                alerts=["Phone number must be exactly 10 digits"]
+            )
+
+        password_hash = bcrypt.hashpw(form.password.data.encode("utf-8"), bcrypt.gensalt())
 
         try:
-            # create user
             user = DBUser(
-                username=form.username.data, 
+                username=form.username.data,
                 password=password_hash.decode("utf-8"),
                 email=form.email.data,
                 first_name=form.first_name.data,
                 surname=form.surname.data,
                 phone_number=form.phone_number.data,
                 address=form.address.data
-                )
+            )
+
             db.session.add(user)
             db.session.commit()
-        except:
-            return render_template("signup.html", title="Sign Up", form=form, alerts=["Username or Email already exists"])
 
-        #login
+        except:
+            return render_template(
+                "signup.html",
+                title="Sign Up",
+                form=form,
+                alerts=["Username or email already exists"]
+            )
+
         login_user(User(user.id, user.username, user.password))
         return redirect(url_for("index"))
-    
+
     return render_template("signup.html", title="Sign Up", form=form, alerts=[])
 
 @app.route("/login", methods=["GET", "POST"])
@@ -364,7 +375,7 @@ def cancel_booking(event_id):
     db.session.commit()
 
     flash("Booking cancelled.", "success")
-    return redirect(url_for("event_details_page", event_id=event.id))
+    return redirect(url_for("event_details_page", event_id=event.id))   
 
 if __name__ == "__main__":
     app.run(debug=True)
